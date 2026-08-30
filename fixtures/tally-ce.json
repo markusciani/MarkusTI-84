@@ -1,0 +1,37 @@
+{
+  "eventId": "event-ce-001",
+  "eventType": "FORM_RESPONSE",
+  "createdAt": "2026-08-30T21:00:00.000Z",
+  "data": {
+    "responseId": "ce-submission-001",
+    "submissionId": "ce-submission-001",
+    "formId": "TODO_TALLY_CE_FORM_ID",
+    "formName": "TI-84 Plus CE & Python Ticket",
+    "createdAt": "2026-08-30T21:00:00.000Z",
+    "fields": [
+      { "key": "TODO_TALLY_CE_FIRST_NAME_FIELD_ID", "label": "First name", "type": "INPUT_TEXT", "value": "Alex" },
+      { "key": "TODO_TALLY_CE_PHONE_FIELD_ID", "label": "Phone", "type": "INPUT_PHONE_NUMBER", "value": "555-0100" },
+      { "key": "TODO_TALLY_CE_EMAIL_FIELD_ID", "label": "Email", "type": "INPUT_EMAIL", "value": "alex@example.com" },
+      { "key": "TODO_TALLY_CE_GRADE_FIELD_ID", "label": "Grade", "type": "DROPDOWN", "value": "Sophomore" },
+      { "key": "TODO_TALLY_CE_CALCULATOR_MODEL_FIELD_ID", "label": "Model", "type": "MULTIPLE_CHOICE", "value": "TI-84 Plus CE Python" },
+      { "key": "TODO_TALLY_CE_VERSION_FIELD_ID", "label": "Version", "type": "INPUT_TEXT", "value": "5.8.1" },
+      { "key": "TODO_TALLY_CE_PYTHON_STATUS_FIELD_ID", "label": "Python", "type": "MULTIPLE_CHOICE", "value": "Yes but remove it" },
+      { "key": "TODO_TALLY_CE_CASE_INCLUDED_FIELD_ID", "label": "Case", "type": "MULTIPLE_CHOICE", "value": "No" },
+      { "key": "TODO_TALLY_CE_CHARGER_INCLUDED_FIELD_ID", "label": "Charger", "type": "MULTIPLE_CHOICE", "value": "Yes" },
+      { "key": "TODO_TALLY_CE_DATE_TIME_CURRENT_FIELD_ID", "label": "Date and time current", "type": "MULTIPLE_CHOICE", "value": "No" },
+      { "key": "TODO_TALLY_CE_CLEAN_CASE_FIELD_ID", "label": "Clean case", "type": "MULTIPLE_CHOICE", "value": "Yes" },
+      { "key": "TODO_TALLY_CE_BACKGROUND_FIELD_ID", "label": "Background", "type": "DROPDOWN", "value": "Purple" },
+      { "key": "TODO_TALLY_CE_GAME_LAUNCHER_METHOD_FIELD_ID", "label": "Launcher", "type": "MULTIPLE_CHOICE", "value": "Existing launcher" },
+      { "key": "TODO_TALLY_CE_EXISTING_LAUNCHER_NAME_FIELD_ID", "label": "Launcher name", "type": "INPUT_TEXT", "value": "Cesium" },
+      { "key": "TODO_TALLY_CE_LAUNCHER_SCREENSHOT_FIELD_ID", "label": "Screenshot", "type": "FILE_UPLOAD", "value": [{ "url": "https://storage.example/launcher.png", "name": "launcher.png", "mimeType": "image/png" }] },
+      { "key": "TODO_TALLY_CE_APPS_TO_REMOVE_FIELD_ID", "label": "Apps to remove", "type": "TEXTAREA", "value": "PlySmlt2" },
+      { "key": "TODO_TALLY_CE_PROGRAMS_TO_REMOVE_FIELD_ID", "label": "Programs to remove", "type": "TEXTAREA", "value": "OLDGAME" },
+      { "key": "TODO_TALLY_CE_GAME_SNAKE_FIELD_ID", "label": "Snake", "type": "MULTIPLE_CHOICE", "value": "No" },
+      { "key": "TODO_TALLY_CE_GAME_TETRIS_FIELD_ID", "label": "Tetris", "type": "MULTIPLE_CHOICE", "value": "Yes" },
+      { "key": "TODO_TALLY_CE_PROGRAM_QUADRATIC_FIELD_ID", "label": "Quadratic Formula", "type": "MULTIPLE_CHOICE", "value": "Yes" },
+      { "key": "TODO_TALLY_CE_DELIVERY_FIELD_ID", "label": "Delivery", "type": "MULTIPLE_CHOICE", "value": "Lunch" },
+      { "key": "TODO_TALLY_CE_PRINT_NAME_FIELD_ID", "label": "Print name", "type": "INPUT_TEXT", "value": "Alex" },
+      { "key": "TODO_TALLY_CE_SIGNATURE_FIELD_ID", "label": "Signature", "type": "SIGNATURE", "value": [{ "url": "https://storage.example/ce-signature.png" }] }
+    ]
+  }
+}

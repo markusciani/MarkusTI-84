@@ -1,0 +1,29 @@
+{
+  "name": "ti-ticket-automation",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "workspaces": ["server", "mac-sync", "shared"],
+  "scripts": {
+    "build": "npm run build -w shared && npm run build -w server && npm run build -w mac-sync",
+    "dev:server": "npm run dev -w server",
+    "fixture:preview": "tsx server/src/previewFixture.ts",
+    "start:server": "npm run start -w server",
+    "sync": "npm run sync -w mac-sync --",
+    "sync:pending": "npm run sync -w mac-sync --",
+    "sync:watch": "npm run start -w mac-sync",
+    "numbers:init": "npm run numbers:init -w mac-sync",
+    "install-agent": "npm run install-agent -w mac-sync",
+    "uninstall-agent": "npm run uninstall-agent -w mac-sync",
+    "install-server-agent": "npm run install-agent -w server",
+    "uninstall-server-agent": "npm run uninstall-agent -w server",
+    "test": "node --import tsx --test --test-concurrency=1 tests/*.test.ts",
+    "typecheck": "tsc -b --pretty false"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2"
+  },
+  "engines": { "node": ">=22.5" }
+}

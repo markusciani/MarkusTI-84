@@ -1,0 +1,58 @@
+# Tally ID replacement checklist
+
+Copy the `data.formId` and each matching `data.fields[].key` from a real Tally webhook event. Do not use the visible question label as the field ID.
+
+Form IDs are environment variables:
+
+- `TALLY_EVO_FORM_ID`
+- `TALLY_CE_FORM_ID`
+
+Field IDs are mapped once in `server/src/config/forms.ts`. Replace every applicable placeholder below. A placeholder for a question your form does not contain can remain; missing and conditionally skipped fields normalize to blank.
+
+## TI-84 Evo
+
+- `TODO_TALLY_EVO_FIRST_NAME_FIELD_ID`
+- `TODO_TALLY_EVO_PHONE_FIELD_ID`
+- `TODO_TALLY_EVO_EMAIL_FIELD_ID`
+- `TODO_TALLY_EVO_GRADE_FIELD_ID`
+- `TODO_TALLY_EVO_CALCULATOR_MODEL_FIELD_ID`
+- `TODO_TALLY_EVO_VERSION_FIELD_ID`
+- `TODO_TALLY_EVO_PYTHON_FIELD_ID`
+- `TODO_TALLY_EVO_CASE_INCLUDED_FIELD_ID`
+- `TODO_TALLY_EVO_CHARGER_INCLUDED_FIELD_ID`
+- `TODO_TALLY_EVO_CLEAN_CASE_FIELD_ID`
+- `TODO_TALLY_EVO_BACKGROUND_FIELD_ID`
+- `TODO_TALLY_EVO_DELIVERY_FIELD_ID`
+- `TODO_TALLY_EVO_PRINT_NAME_FIELD_ID`
+- `TODO_TALLY_EVO_SIGNATURE_FIELD_ID`
+- Individual `TODO_TALLY_EVO_GAME_*_FIELD_ID` entries, or `TODO_TALLY_EVO_GAMES_MULTISELECT_FIELD_ID`
+- Individual `TODO_TALLY_EVO_PROGRAM_*_FIELD_ID` entries, or `TODO_TALLY_EVO_PROGRAMS_MULTISELECT_FIELD_ID`
+
+Add all other games/programs from the live form to the corresponding configured group. The included entries are examples, not a claimed copy of the live form.
+
+## TI-84 Plus CE / Python
+
+- `TODO_TALLY_CE_FIRST_NAME_FIELD_ID`
+- `TODO_TALLY_CE_PHONE_FIELD_ID`
+- `TODO_TALLY_CE_EMAIL_FIELD_ID`
+- `TODO_TALLY_CE_GRADE_FIELD_ID`
+- `TODO_TALLY_CE_CALCULATOR_MODEL_FIELD_ID`
+- `TODO_TALLY_CE_VERSION_FIELD_ID`
+- `TODO_TALLY_CE_PYTHON_STATUS_FIELD_ID`
+- `TODO_TALLY_CE_CASE_INCLUDED_FIELD_ID`
+- `TODO_TALLY_CE_CHARGER_INCLUDED_FIELD_ID`
+- `TODO_TALLY_CE_DATE_TIME_CURRENT_FIELD_ID`
+- `TODO_TALLY_CE_CLEAN_CASE_FIELD_ID`
+- `TODO_TALLY_CE_BACKGROUND_FIELD_ID`
+- `TODO_TALLY_CE_GAME_LAUNCHER_METHOD_FIELD_ID`
+- `TODO_TALLY_CE_EXISTING_LAUNCHER_NAME_FIELD_ID`
+- `TODO_TALLY_CE_LAUNCHER_SCREENSHOT_FIELD_ID`
+- `TODO_TALLY_CE_APPS_TO_REMOVE_FIELD_ID`
+- `TODO_TALLY_CE_PROGRAMS_TO_REMOVE_FIELD_ID`
+- `TODO_TALLY_CE_DELIVERY_FIELD_ID`
+- `TODO_TALLY_CE_PRINT_NAME_FIELD_ID`
+- `TODO_TALLY_CE_SIGNATURE_FIELD_ID`
+- Individual `TODO_TALLY_CE_GAME_*_FIELD_ID` entries, or `TODO_TALLY_CE_GAMES_MULTISELECT_FIELD_ID`
+- Individual `TODO_TALLY_CE_PROGRAM_*_FIELD_ID` entries, or `TODO_TALLY_CE_PROGRAMS_MULTISELECT_FIELD_ID`
+
+Never add the TI Family Form Search ID to `formConfigs`.

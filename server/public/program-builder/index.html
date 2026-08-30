@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Calculator Program Builder</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand-mark">M<span>84</span></div>
+    <div>
+      <p class="eyebrow">MARKUS &amp; TI-84</p>
+      <h1>Calculator Program Builder</h1>
+    </div>
+    <div class="connection" id="connectionState"><i></i> Not connected</div>
+  </header>
+
+  <main>
+    <section class="auth-card" id="authCard">
+      <div>
+        <p class="eyebrow blue">SECURE ACCESS</p>
+        <h2>Connect to the ticket database</h2>
+        <p>Your API secret stays in this browser tab and is never added to generated calculator programs.</p>
+      </div>
+      <form id="authForm">
+        <label>API secret<input id="apiSecret" type="password" autocomplete="current-password" required></label>
+        <button class="primary" type="submit">CONNECT</button>
+      </form>
+    </section>
+
+    <section class="workspace hidden" id="workspace">
+      <aside class="controls">
+        <section class="panel intro-panel">
+          <div>
+            <p class="eyebrow blue">SNAPSHOT BUILDER</p>
+            <h2>Build TILOGS</h2>
+          </div>
+          <span class="ticket-count" id="databaseCount">0 tickets</span>
+          <p>Creates an offline TI-BASIC snapshot. No phone, email, signatures, uploads, or raw webhook data are included by default.</p>
+        </section>
+
+        <section class="panel form-panel">
+          <div class="section-heading"><span>01</span><h3>Program</h3></div>
+          <div class="form-grid two">
+            <label>Calculator<select id="calculator"></select></label>
+            <label>Format<select id="format"><option value="ti-basic">TI-BASIC source</option></select></label>
+            <label>Program name<input id="programName" value="TILOGS" maxlength="8" spellcheck="false"></label>
+            <label>Template<select id="template"><option value="">Custom</option></select></label>
+          </div>
+          <div class="inline-actions"><button id="saveTemplate" class="quiet" type="button">SAVE TEMPLATE</button></div>
+        </section>
+
+        <section class="panel form-panel">
+          <div class="section-heading"><span>02</span><h3>Tickets</h3></div>
+          <div class="form-grid two">
+            <label>Ticket calculator<select id="filterCalculator"><option value="">All calculators</option></select></label>
+            <label>Maximum tickets<input id="limit" type="number" min="1" max="50" value="20" list="limitChoices"><datalist id="limitChoices"><option value="5"><option value="10"><option value="20"><option value="30"><option value="50"></datalist></label>
+            <label>From date<input id="dateFrom" type="date"></label>
+            <label>To date<input id="dateTo" type="date"></label>
+            <label>Exact Ticket ID<input id="ticketId" placeholder="EVO-0042" spellcheck="false"></label>
+            <label>Sort<select id="sort"><option value="newest">Newest First</option><option value="oldest">Oldest First</option><option value="ticket-id">Ticket ID</option></select></label>
+            <label>ID range from<input id="ticketIdFrom" placeholder="EVO-0040" spellcheck="false"></label>
+            <label>ID range to<input id="ticketIdTo" placeholder="EVO-0050" spellcheck="false"></label>
+          </div>
+          <fieldset><legend>Status filters <small>None selected means all</small></legend><div class="chip-grid" id="statusFilters"></div></fieldset>
+        </section>
+
+        <section class="panel form-panel">
+          <div class="section-heading"><span>03</span><h3>Fields</h3></div>
+          <div class="check-grid" id="safeFields">
+            <label><input type="checkbox" data-field="ticketId" checked>Ticket ID</label>
+            <label><input type="checkbox" data-field="firstName" checked>First Name</label>
+            <label><input type="checkbox" data-field="calculator" checked>Calculator</label>
+            <label><input type="checkbox" data-field="status" checked>Status</label>
+            <label><input type="checkbox" data-field="games" checked>Games</label>
+            <label><input type="checkbox" data-field="programs" checked>Programs</label>
+            <label><input type="checkbox" data-field="delivery" checked>Delivery</label>
+            <label><input type="checkbox" data-field="submittedDate" checked>Submitted Date</label>
+          </div>
+          <details class="advanced privacy">
+            <summary>Advanced private fields <span>OFF BY DEFAULT</span></summary>
+            <p>Anything enabled here will be embedded permanently in the exported source snapshot.</p>
+            <div class="check-grid">
+              <label><input type="checkbox" data-field="phone">Phone</label>
+              <label><input type="checkbox" data-field="email">Email</label>
+            </div>
+          </details>
+        </section>
+
+        <section class="panel form-panel">
+          <div class="section-heading"><span>04</span><h3>Editor settings</h3></div>
+          <div class="form-grid">
+            <label>Title<input id="title" value="TI TICKET LOGS" maxlength="26"></label>
+            <label>About text<textarea id="aboutText" rows="3">TICKET SNAPSHOT - NO NETWORK REQUIRED</textarea></label>
+            <label>Footer<input id="footer" value="&lt;&gt; MOVE CLEAR BACK" maxlength="26"></label>
+          </div>
+          <details class="advanced">
+            <summary>Customize menu options</summary>
+            <div class="form-grid three" id="menuLabels"></div>
+          </details>
+        </section>
+
+        <div class="sticky-actions">
+          <button id="previewButton" class="secondary" type="button">PREVIEW</button>
+          <button id="generateButton" class="primary" type="button">GENERATE</button>
+          <button id="downloadButton" class="download" type="button" disabled>DOWNLOAD SOURCE</button>
+        </div>
+      </aside>
+
+      <section class="output-column">
+        <section class="panel output-panel">
+          <div class="output-header">
+            <div><p class="eyebrow blue">CALCULATOR PREVIEW</p><h2 id="previewTitle">TI TICKET LOGS</h2></div>
+            <div class="view-toggle"><button class="active" data-view="menu">MENU</button><button data-view="ticket">TICKET</button></div>
+          </div>
+          <div class="calculator-shell">
+            <div class="calculator-top"><span>TI-84</span><strong>EVO</strong></div>
+            <pre class="screen" id="screenPreview">TI TICKET LOGS
+
+1 ALL TICKETS
+2 NEW
+3 WORKING
+4 READY
+5 COMPLETED
+6 SEARCH
+
+9 EXIT</pre>
+            <div class="keypad"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          </div>
+          <div class="metrics">
+            <div><span>Estimated size</span><strong id="sizeMetric">—</strong></div>
+            <div><span>Tickets</span><strong id="ticketMetric">—</strong></div>
+            <div><span>Output</span><strong>TI-BASIC</strong></div>
+          </div>
+          <p class="warning hidden" id="sizeWarning"></p>
+          <p class="privacy-warning hidden" id="privacyWarning">Private fields are enabled and will be embedded in this calculator snapshot.</p>
+        </section>
+
+        <section class="panel source-panel">
+          <div class="output-header">
+            <div><p class="eyebrow">ADVANCED MODE</p><h2>Generated TI-BASIC source</h2></div>
+            <span id="editState">Generated source</span>
+          </div>
+          <textarea id="sourceEditor" spellcheck="false" placeholder="Generate a preview to inspect the TI-BASIC source."></textarea>
+          <div class="inline-actions source-actions">
+            <button id="resetSource" class="quiet" type="button" disabled>RESET GENERATED SOURCE</button>
+            <button id="copySource" class="quiet" type="button" disabled>COPY SOURCE</button>
+          </div>
+        </section>
+      </section>
+    </section>
+  </main>
+  <div class="toast" id="toast" role="status"></div>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "name": "@ti-tickets/mac-sync",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js --watch",
+    "sync": "tsx src/index.ts",
+    "numbers:init": "tsx src/initialize.ts",
+    "install-agent": "npm run build -w @ti-tickets/shared && npm run build && tsx scripts/install-agent.ts",
+    "uninstall-agent": "tsx scripts/uninstall-agent.ts"
+  },
+  "dependencies": {
+    "@ti-tickets/shared": "*",
+    "dotenv": "^17.2.1"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "eventId": "event-evo-001",
+  "eventType": "FORM_RESPONSE",
+  "createdAt": "2026-08-30T20:30:00.000Z",
+  "data": {
+    "responseId": "evo-submission-001",
+    "submissionId": "evo-submission-001",
+    "formId": "TODO_TALLY_EVO_FORM_ID",
+    "formName": "TI-84 Evo Ticket",
+    "createdAt": "2026-08-30T20:30:00.000Z",
+    "fields": [
+      { "key": "TODO_TALLY_EVO_FIRST_NAME_FIELD_ID", "label": "First name", "type": "INPUT_TEXT", "value": "John" },
+      { "key": "TODO_TALLY_EVO_PHONE_FIELD_ID", "label": "Phone", "type": "INPUT_PHONE_NUMBER", "value": "555-555-5555" },
+      { "key": "TODO_TALLY_EVO_EMAIL_FIELD_ID", "label": "Email", "type": "INPUT_EMAIL", "value": "john@example.com" },
+      { "key": "TODO_TALLY_EVO_GRADE_FIELD_ID", "label": "Grade", "type": "MULTIPLE_CHOICE", "value": ["grade-junior"], "options": [{ "id": "grade-junior", "text": "Junior" }] },
+      { "key": "TODO_TALLY_EVO_CALCULATOR_MODEL_FIELD_ID", "label": "Calculator model", "type": "INPUT_TEXT", "value": "TI-84 Evo" },
+      { "key": "TODO_TALLY_EVO_VERSION_FIELD_ID", "label": "Version", "type": "INPUT_TEXT", "value": "7.0.0.3996" },
+      { "key": "TODO_TALLY_EVO_PYTHON_FIELD_ID", "label": "Python", "type": "MULTIPLE_CHOICE", "value": ["yes"], "options": [{ "id": "yes", "text": "Yes" }] },
+      { "key": "TODO_TALLY_EVO_CASE_INCLUDED_FIELD_ID", "label": "Case included", "type": "MULTIPLE_CHOICE", "value": "Yes" },
+      { "key": "TODO_TALLY_EVO_CHARGER_INCLUDED_FIELD_ID", "label": "Charger included", "type": "MULTIPLE_CHOICE", "value": "Yes" },
+      { "key": "TODO_TALLY_EVO_CLEAN_CASE_FIELD_ID", "label": "Clean case", "type": "CHECKBOX", "value": true },
+      { "key": "TODO_TALLY_EVO_BACKGROUND_FIELD_ID", "label": "Background", "type": "DROPDOWN", "value": "Blue Mountains" },
+      { "key": "TODO_TALLY_EVO_GAME_SNAKE_FIELD_ID", "label": "Snake", "type": "MULTIPLE_CHOICE", "value": "Yes" },
+      { "key": "TODO_TALLY_EVO_GAME_TETRIS_FIELD_ID", "label": "Tetris", "type": "MULTIPLE_CHOICE", "value": "No" },
+      { "key": "TODO_TALLY_EVO_GAMES_MULTISELECT_FIELD_ID", "label": "More games", "type": "MULTIPLE_CHOICE", "value": ["game-wordle", "game-2048"], "options": [{ "id": "game-wordle", "text": "Wordle" }, { "id": "game-2048", "text": "2048" }] },
+      { "key": "TODO_TALLY_EVO_PROGRAM_QUADRATIC_FIELD_ID", "label": "Quadratic Formula", "type": "MULTIPLE_CHOICE", "value": "Yes" },
+      { "key": "TODO_TALLY_EVO_PROGRAM_RADICAL_FIELD_ID", "label": "Radical Simplifier", "type": "MULTIPLE_CHOICE", "value": "No" },
+      { "key": "TODO_TALLY_EVO_PROGRAMS_MULTISELECT_FIELD_ID", "label": "More programs", "type": "MULTIPLE_CHOICE", "value": ["unit-circle"], "options": [{ "id": "unit-circle", "text": "Unit Circle" }] },
+      { "key": "TODO_TALLY_EVO_DELIVERY_FIELD_ID", "label": "Delivery", "type": "MULTIPLE_CHOICE", "value": "Before school" },
+      { "key": "TODO_TALLY_EVO_PRINT_NAME_FIELD_ID", "label": "Print name", "type": "INPUT_TEXT", "value": "John" },
+      { "key": "TODO_TALLY_EVO_SIGNATURE_FIELD_ID", "label": "Signature", "type": "SIGNATURE", "value": [{ "url": "https://storage.example/signature.png", "name": "signature.png", "mimeType": "image/png" }] }
+    ]
+  }
+}
