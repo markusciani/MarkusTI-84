@@ -22,7 +22,8 @@ function toast(message, error = false) {
 }
 
 async function api(path, options = {}) {
-  const response = await fetch(`${apiBaseUrl.replace(/\\/$/, "")}${path}`, {
+  const baseUrl = apiBaseUrl.endsWith("/") ? apiBaseUrl.slice(0, -1) : apiBaseUrl;
+  const response = await fetch(`${baseUrl}${path}`, {
     ...options,
     headers: { authorization: `Bearer ${apiSecret}`, "content-type": "application/json", ...(options.headers || {}) }
   });
@@ -228,7 +229,7 @@ function updatePrivacyWarning() {
 $("#authForm").addEventListener("submit", async (event) => {
   event.preventDefault();
   apiSecret = $("#apiSecret").value;
-  apiBaseUrl = $("#apiBaseUrl").value.trim().replace(/\\/$/, "");
+  apiBaseUrl = $("#apiBaseUrl").value.trim();
   sessionStorage.setItem("tiBuilderApiBaseUrl", apiBaseUrl);
   await connect();
 });
