@@ -4,6 +4,7 @@ const menuDefaults = {
   all: "ALL TICKETS", new: "NEW", working: "WORKING", ready: "READY", completed: "COMPLETED",
   search: "SEARCH", stats: "STATS", about: "ABOUT", exit: "EXIT"
 };
+let apiBaseUrl = sessionStorage.getItem("tiBuilderApiBaseUrl") || window.TI_API_BASE_URL || window.location.origin;
 let apiSecret = sessionStorage.getItem("tiBuilderApiSecret") || "";
 let config = null;
 let tickets = [];
@@ -21,7 +22,7 @@ function toast(message, error = false) {
 }
 
 async function api(path, options = {}) {
-  const response = await fetch(path, {
+  const response = await fetch(`${apiBaseUrl.replace(/\\/$/, "")}${path}`, {
     ...options,
     headers: { authorization: `Bearer ${apiSecret}`, "content-type": "application/json", ...(options.headers || {}) }
   });
@@ -227,6 +228,8 @@ function updatePrivacyWarning() {
 $("#authForm").addEventListener("submit", async (event) => {
   event.preventDefault();
   apiSecret = $("#apiSecret").value;
+  apiBaseUrl = $("#apiBaseUrl").value.trim().replace(/\\/$/, "");
+  sessionStorage.setItem("tiBuilderApiBaseUrl", apiBaseUrl);
   await connect();
 });
 $("#previewButton").addEventListener("click", () => runBuilder("preview"));
@@ -281,6 +284,7 @@ $("#saveTemplate").addEventListener("click", () => {
 });
 
 renderMenuInputs();
+$("#apiBaseUrl").value = apiBaseUrl;
 if (apiSecret) {
   $("#apiSecret").value = apiSecret;
   connect();

@@ -28,6 +28,19 @@ export function createApp(db: DatabaseSync, options: AppOptions = {}) {
   const pathToken = options.webhookPathToken ?? process.env.WEBHOOK_PATH_TOKEN;
   const allowInsecure = options.allowInsecureWebhooks ?? process.env.ALLOW_INSECURE_WEBHOOKS === "true";
 
+  const webAppOrigin = process.env.WEB_APP_ORIGIN;
+  app.use((req, res, next) => {
+    const origin = req.header("origin");
+    if (webAppOrigin && origin === webAppOrigin) {
+      res.setHeader("access-control-allow-origin", origin);
+      res.setHeader("access-control-allow-headers", "authorization,content-type");
+      res.setHeader("access-control-allow-methods", "GET,POST,PATCH,OPTIONS");
+      res.setHeader("vary", "Origin");
+    }
+    if (req.method === "OPTIONS") return res.sendStatus(204);
+    next();
+  });
+
   app.use(express.json({
     limit: "2mb",
     verify: (req, _res, buffer) => { (req as RawRequest).rawBody = Buffer.from(buffer); }
