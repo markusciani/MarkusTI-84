@@ -1,8 +1,9 @@
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
 const menuDefaults = {
-  all: "Tickets", search: "Search", stats: "Stats", about: "About", exit: "Quit"
+  all: "Tickets", search: "Search", stats: "Stats", about: "System", exit: "Quit"
 };
+const menuNames = { all: "Tickets", search: "Search", stats: "Stats", about: "System", exit: "Quit" };
 const apiBaseUrl = (window.TI_API_BASE_URL || window.location.origin).replace(/\/$/, "");
 let sessionToken = sessionStorage.getItem("tiBuilderSession") || "";
 let config = null;
@@ -73,7 +74,7 @@ function renderMenuInputs() {
   const container = $("#menuLabels");
   for (const [key, value] of Object.entries(menuDefaults)) {
     const label = document.createElement("label");
-    label.textContent = key[0].toUpperCase() + key.slice(1);
+    label.textContent = menuNames[key];
     const input = document.createElement("input");
     input.dataset.menu = key;
     input.value = value;
@@ -143,7 +144,6 @@ function requestPayload() {
     fields: selectedFields(),
     options: {
       title: $("#title").value,
-      aboutText: $("#aboutText").value,
       footer: $("#footer").value,
       menuLabels: Object.fromEntries($$("[data-menu]").map((input) => [input.dataset.menu, input.value]))
     }
@@ -310,7 +310,6 @@ function applyTemplate(templateConfig) {
   if (templateConfig.programName) $("#programName").value = templateConfig.programName;
   if (templateConfig.options) {
     $("#title").value = templateConfig.options.title || "TI Ticket Logs";
-    $("#aboutText").value = templateConfig.options.aboutText || "Offline ticket snapshot generated from the private ticket database";
     $("#footer").value = templateConfig.options.footer || "Select a menu item";
     $$("[data-menu]").forEach((input) => { input.value = templateConfig.options.menuLabels?.[input.dataset.menu] || menuDefaults[input.dataset.menu]; });
   }

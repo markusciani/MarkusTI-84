@@ -2,7 +2,7 @@ import type { CalculatorModel } from "../models.js";
 import { calculatorSafeText, shortStatus, ticketNumber, validProgramName, wrapCalculatorText } from "../formatter.js";
 import type { BuilderFields, CalculatorTicket, ProgramBuildResult, ProgramOptions } from "../types.js";
 
-const DEFAULT_MENU = { tickets: "Tickets", search: "Search", stats: "Stats", about: "About", quit: "Quit" };
+const DEFAULT_MENU = { tickets: "Tickets", search: "Search", stats: "Stats", system: "System", quit: "Quit" };
 const BUILDER_PASSWORD = "C1@nI-0I-Ti_84";
 
 function enabled(fields: BuilderFields, key: keyof BuilderFields, fallback = true): boolean {
@@ -88,13 +88,12 @@ export function generateTiBasic(input: {
   const { model, tickets, fields } = input;
   const programName = validProgramName(input.programName, model.programNameMaxLength);
   const title = sourceString(input.options?.title || "TI Ticket Logs");
-  const aboutText = input.options?.aboutText || "Offline ticket snapshot generated from the private ticket database";
   const configuredMenu = input.options?.menuLabels || {};
   const menu = {
     tickets: sourceString(configuredMenu.all || DEFAULT_MENU.tickets),
     search: sourceString(configuredMenu.search || DEFAULT_MENU.search),
     stats: sourceString(configuredMenu.stats || DEFAULT_MENU.stats),
-    about: sourceString(configuredMenu.about || DEFAULT_MENU.about),
+    system: sourceString(configuredMenu.about || DEFAULT_MENU.system),
     quit: sourceString(configuredMenu.exit || DEFAULT_MENU.quit)
   };
   const allocate = createLabelAllocator();
@@ -106,17 +105,11 @@ export function generateTiBasic(input: {
   const gameTextPages = tickets.map((ticket) => twoLineTextPages(ticket.games, model.displayColumns));
   const gamePages = gameTextPages.map((pages) => Array.from({ length: pages.length }, () => allocate()));
   const programPages = tickets.map((ticket) => Array.from({ length: Math.max(1, Math.ceil(ticket.programs.length / 4)) }, () => allocate()));
-  const aboutMenu = allocate();
-  const aboutPurpose = allocate();
-  const aboutPrivacy = allocate();
-  const aboutRefresh = allocate();
-  const aboutControls = allocate();
-  const preferencesPin = allocate();
-  const preferencesLogin = allocate();
+  const systemPage = allocate();
 
   const source: string[] = [
     ":Lbl M",
-    menuLine(title, [[menu.tickets, "A"], [menu.search, "S"], [menu.stats, "T"], [menu.about, "B"], [menu.quit, "X"]]),
+    menuLine(title, [[menu.tickets, "A"], [menu.search, "S"], [menu.stats, "T"], [menu.system, "B"], [menu.quit, "X"]]),
     ":Lbl A",
     tickets.length ? `:Goto ${listPages[0]}` : ":ClrHome",
     ...(!tickets.length ? [':Disp "No tickets"', ":Pause ", ":Goto M"] : [])
@@ -197,25 +190,10 @@ export function generateTiBasic(input: {
   );
 
   source.push(
-    ":Lbl B", `:Goto ${aboutMenu}`,
-    `:Lbl ${aboutMenu}`,
-    menuLine("About TILOGS", [
-      ["Purpose", aboutPurpose], ["Privacy", aboutPrivacy], ["Refresh data", aboutRefresh],
-      ["Controls", aboutControls], ["Preferences", preferencesPin], ["Back", "M"]
-    ]),
-    `:Lbl ${aboutPurpose}`,
-    ...displayScreen("Purpose", wrapCalculatorText(aboutText, model.displayColumns, model.displayRows - 2), aboutMenu, model.displayRows),
-    `:Lbl ${aboutPrivacy}`,
-    ...displayScreen("Privacy", ["Offline snapshot", "No signature files", "No upload links", "Contact is optional"], aboutMenu, model.displayRows),
-    `:Lbl ${aboutRefresh}`,
-    ...displayScreen("Refresh data", ["Rebuild TILOGS", "on the website", "then replace this", "calculator program"], aboutMenu, model.displayRows),
-    `:Lbl ${aboutControls}`,
-    ...displayScreen("Controls", ["Select a menu item", "Next/Prev changes page", "Ticket goes back", "Quit closes TILOGS"], aboutMenu, model.displayRows),
-    `:Lbl ${preferencesPin}`,
-    ":ClrHome", ':Input "Admin PIN:",Z', `:If Z=2010`, `:Goto ${preferencesLogin}`,
-    ':Disp "Incorrect PIN"', ":Pause ", `:Goto ${aboutMenu}`,
-    `:Lbl ${preferencesLogin}`,
-    ...displayScreen("Preferences", ["https://", "ti-ticket-builder", ".pages.dev", "Password:", BUILDER_PASSWORD], aboutMenu, model.displayRows),
+    ":Lbl B", ":ClrHome", ':Input "Admin PIN:",Z', `:If Z=2010`, `:Goto ${systemPage}`,
+    ':Disp "Incorrect PIN"', ":Pause ", ":Goto M",
+    `:Lbl ${systemPage}`,
+    ...displayScreen("System", ["https://", "ti-ticket-builder", ".pages.dev", "Password:", BUILDER_PASSWORD], "M", model.displayRows),
     ":Lbl X", ":ClrHome", ":Stop"
   );
 

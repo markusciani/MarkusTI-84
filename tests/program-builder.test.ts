@@ -50,11 +50,11 @@ test("filters calculator, status, date, ID range, order, and limit", () => {
   assert.deepEqual(filterTickets(tickets, { dateFrom: "2026-08-30", ticketIdFrom: "EVO-0042", ticketIdTo: "EVO-0043", sort: "ticket-id" }).map((ticket) => ticket.ticketId), ["EVO-0042", "EVO-0043"]);
 });
 
-test("generates five-item main menu, ticket submenus, search, stats, about, and privacy-safe TI-BASIC", () => {
+test("generates five-item main menu, ticket submenus, search, stats, system, and privacy-safe TI-BASIC", () => {
   const result = buildProgram(request, tickets);
   assert.equal(result.programName, "TILOGS");
   assert.equal(result.ticketCount, 3);
-  assert.match(result.source, /:Menu\("TI Ticket Logs","Tickets",A,"Search",S,"Stats",T,"About",B,"Quit",X\)/);
+  assert.match(result.source, /:Menu\("TI Ticket Logs","Tickets",A,"Search",S,"Stats",T,"System",B,"Quit",X\)/);
   assert.doesNotMatch(result.source, /"New",|"Working",|"Completed",/);
   assert.match(result.source, /:Menu\("Tickets 1\/1","EVO-0043 Sam",[A-Z]{2},"EVO-0042 Jose",[A-Z]{2},"CE-0042 Alex",[A-Z]{2},"Main menu",M\)/);
   assert.match(result.source, /:Menu\("EVO-0042","Overview",[A-Z]{2},"Games",[A-Z]{2},"Programs",[A-Z]{2},"Delivery",[A-Z]{2},"Back",[A-Z]{2}\)/);
@@ -66,8 +66,9 @@ test("generates five-item main menu, ticket submenus, search, stats, about, and 
   assert.match(result.source, /:Disp "Ticket not found"\n:Pause \n:Goto M\n:Lbl [A-Z]{2}\n:Menu\("TICKET 42"/);
   assert.match(result.source, /:Disp "Ticket stats"/);
   assert.doesNotMatch(result.source, /READY:|WORKING:|COMPLETED:/);
-  assert.match(result.source, /"Preferences",[A-Z]{2}/);
+  assert.doesNotMatch(result.source, /About TILOGS|Purpose|Privacy|Refresh data|Controls|Preferences/);
   assert.match(result.source, /:Input "Admin PIN:",Z\n:If Z=2010/);
+  assert.match(result.source, /:Disp "System"/);
   assert.match(result.source, /:Disp "https:\/\/"\n:Disp "ti-ticket-builder"\n:Disp "\.pages\.dev"\n:Disp "Password:"\n:Disp "C1@nI-0I-Ti_84"/);
   assert.doesNotMatch(result.source, /555-0100|jose@example\.com/i);
   assert.ok(result.estimatedBytes > 0);
