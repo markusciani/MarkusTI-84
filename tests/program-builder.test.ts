@@ -58,7 +58,7 @@ test("generates five-item main menu, ticket submenus, search, stats, system, and
   assert.doesNotMatch(result.source, /"New",|"Working",|"Completed",/);
   assert.match(result.source, /:Menu\("Tickets 1\/1","EVO-0043 Sam",[A-Z]{2},"EVO-0042 Jose",[A-Z]{2},"CE-0042 Alex",[A-Z]{2},"Main menu",M\)/);
   assert.match(result.source, /:Menu\("EVO-0042","Overview",[A-Z]{2},"Games",[A-Z]{2},"Programs",[A-Z]{2},"Delivery",[A-Z]{2},"Back",[A-Z]{2}\)/);
-  assert.match(result.source, /:Disp "Games 1\/1"\n:Disp "Pokemon, Snake"\n:Disp "Tetris"\n:Pause \n:Goto [A-Z]{2}/);
+  assert.match(result.source, /:Disp "Games 1\/1"\n:Disp "Pokemon, Snake, Tetris"\n:Pause \n:Goto [A-Z]{2}/);
   assert.doesNotMatch(result.source, /:Menu\("Games/);
   assert.match(result.source, /:Menu\("Programs 1\/1","Quadratic Formula",[A-Z]{2},"Radical Simplifier",[A-Z]{2},"Ticket",[A-Z]{2}\)/);
   assert.match(result.source, /:Input "Ticket number:",N/);
@@ -72,6 +72,14 @@ test("generates five-item main menu, ticket submenus, search, stats, system, and
   assert.match(result.source, /:Disp "https:\/\/"\n:Disp "ti-ticket-builder"\n:Disp "\.pages\.dev"\n:Disp "Password:"\n:Disp "C1@nI-0I-Ti_84"/);
   assert.doesNotMatch(result.source, /555-0100|jose@example\.com/i);
   assert.ok(result.estimatedBytes > 0);
+});
+
+test("games use the full display as plain text before advancing pages", () => {
+  const manyGames = Array.from({ length: 24 }, (_, index) => `Game title ${index + 1}`);
+  const result = buildProgram(request, [{ ...tickets[0], games: manyGames }]);
+  const firstPage = result.source.match(/:Disp "Games 1\/\d+"\n([\s\S]*?):Pause /)?.[1] || "";
+  assert.equal((firstPage.match(/:Disp /g) || []).length, 8);
+  assert.doesNotMatch(result.source, /:Menu\("Games/);
 });
 
 test("advanced phone and email fields are included only when explicitly enabled", () => {

@@ -40,13 +40,10 @@ function ticketListName(ticket: CalculatorTicket, showFirstName: boolean): strin
   return showFirstName && ticket.firstName ? `${ticket.ticketId} ${ticket.firstName}` : ticket.ticketId;
 }
 
-function twoLineTextPages(values: string[], width: number): string[][] {
-  let lines = values.length ? wrapCalculatorText(values.join(", "), width, 1000) : ["None requested"];
-  if (values.length > 1 && lines.length === 1) {
-    const split = Math.ceil(values.length / 2);
-    lines = [values.slice(0, split).join(", "), values.slice(split).join(", ")];
-  }
-  return Array.from({ length: Math.ceil(lines.length / 2) }, (_, page) => lines.slice(page * 2, page * 2 + 2));
+function textPages(values: string[], width: number, linesPerPage: number): string[][] {
+  const lines = values.length ? wrapCalculatorText(values.join(", "), width, 1000) : ["None requested"];
+  return Array.from({ length: Math.ceil(lines.length / linesPerPage) }, (_, page) =>
+    lines.slice(page * linesPerPage, page * linesPerPage + linesPerPage));
 }
 
 function pagedText(input: { title: string; pages: string[][]; pageLabels: string[]; returnLabel: string }): string[] {
@@ -102,7 +99,7 @@ export function generateTiBasic(input: {
   const deliveryLabels = tickets.map(() => allocate());
   const contactLabels = tickets.map(() => allocate());
   const listPages = Array.from({ length: Math.max(1, Math.ceil(tickets.length / 4)) }, () => allocate());
-  const gameTextPages = tickets.map((ticket) => twoLineTextPages(ticket.games, model.displayColumns));
+  const gameTextPages = tickets.map((ticket) => textPages(ticket.games, model.displayColumns, Math.max(1, model.displayRows - 2)));
   const gamePages = gameTextPages.map((pages) => Array.from({ length: pages.length }, () => allocate()));
   const programPages = tickets.map((ticket) => Array.from({ length: Math.max(1, Math.ceil(ticket.programs.length / 4)) }, () => allocate()));
   const systemPage = allocate();

@@ -198,7 +198,7 @@ Open the Builder in Google Chrome and enter the dedicated Builder password. The 
 - TI-BASIC source generation for TI-84 Evo, TI-84 Plus CE, TI-84 Plus CE Python, and TI-84 Plus / TI-83 Plus
 - A compact five-item `TILOGS` main menu with Tickets, Search, Stats, System, and Quit
 - Ticket lists show each Ticket ID beside the customer's first name
-- Ticket sections include Overview, two-line Games pages, Programs, Delivery, and optional Contact
+- Ticket sections include Overview, full-screen plain-text Games pages, Programs, Delivery, and optional Contact
 - Numeric Ticket ID search, including a result menu when multiple calculator families share the same number
 - Calculator, status, date, exact ID, ID range, recency-limit, and sort filters
 - A calculator-style preview, source editor, reset/copy controls, text download, size estimate, and model warning
