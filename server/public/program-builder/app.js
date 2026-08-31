@@ -12,6 +12,8 @@ let generated = null;
 let generatedSource = "";
 let manualEdited = false;
 let activePreview = "menu";
+let tiFileEnginePromise = null;
+const TI_FILE_ENGINE_URL = "https://cdn.jsdelivr.net/gh/adriweb/tivars_lib_cpp@0d3bca2e081a273784e5cc0c139179177e76f969/TIVarsLib.js";
 
 function toast(message, error = false) {
   const element = $("#toast");
@@ -172,6 +174,8 @@ function renderResult(result) {
   $("#sizeWarning").classList.toggle("hidden", !result.warning);
   $("#downloadButton").disabled = false;
   $("#sendToCalculator").disabled = false;
+  const evo = $("#calculator").value === "TI-84 Evo";
+  $("#sendToCalculator").textContent = evo ? "DOWNLOAD .8XP2 + OPEN TI CONNECT" : "DOWNLOAD .8XP";
   $("#copySource").disabled = false;
   $("#resetSource").disabled = false;
   renderScreen();
@@ -197,11 +201,80 @@ function downloadSource() {
   toast(`Downloaded ${generated.fileName}${manualEdited ? " with manual edits" : ""}`);
 }
 
-function openTiConnect() {
+async function tiFileEngine() {
+  if (!tiFileEnginePromise) {
+    tiFileEnginePromise = import(TI_FILE_ENGINE_URL).then(({ default: createEngine }) => createEngine({
+      noInitialRun: true, print: () => {}, printErr: () => {}
+    }));
+  }
+  return tiFileEnginePromise;
+}
+
+function engineSource() {
+  return $("#sourceEditor").value.replace(/\r\n?/g, "\n")
+    .split("\n").map((line) => line.replace(/^(\s*):/, "$1")).join("\n").replace(/\n+$/, "");
+}
+
+function readEngineFile(engine, path) {
+  const data = engine.FS.readFile(path, { encoding: "binary" });
+  return data instanceof Uint8Array ? data : Uint8Array.from(data, (character) => character.charCodeAt(0) & 0xff);
+}
+
+async function buildCalculatorFile() {
+  if (!generated) throw new Error("Generate a program first");
+  const engine = await tiFileEngine();
+  const evo = $("#calculator").value === "TI-84 Evo";
+  const extension = evo ? "8xp2" : "8xp";
+  const targetModel = evo ? "84Evo" : "84+CE";
+  const path = `/builder-${Date.now()}.${extension}`;
+  const verifyPath = `/verify-${Date.now()}.${extension}`;
+  let program;
+  let verified;
+  try {
+    program = engine.TIVarFile.createNew("Program", generated.programName, targetModel);
+    program.setContentFromString(engineSource());
+    const rawHex = program.getRawContentHexStr();
+    const savedPath = program.saveVarToFile("", path.replace(/^\//, "").replace(/\.[^.]+$/, ""));
+    const bytes = readEngineFile(engine, savedPath);
+    engine.FS.writeFile(verifyPath, bytes);
+    verified = engine.TIVarFile.loadFromFile(verifyPath);
+    if (verified.isCorrupt()) throw new Error("The calculator file failed checksum validation");
+    if (verified.isEvoFormat() !== evo) throw new Error("The calculator file was created for the wrong model");
+    if (verified.getRawContentHexStr() !== rawHex) throw new Error("The calculator file failed token verification");
+    return { bytes: new Uint8Array(bytes), fileName: `${generated.programName}.${extension}` };
+  } finally {
+    try { verified?.delete(); } catch { /* already released */ }
+    try { program?.delete(); } catch { /* already released */ }
+    for (const candidate of [path, verifyPath]) {
+      try { engine.FS.unlink(candidate); } catch { /* virtual file was named differently or already removed */ }
+    }
+  }
+}
+
+async function downloadCalculatorFile() {
+  const artifact = await buildCalculatorFile();
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(new Blob([artifact.bytes], { type: "application/octet-stream" }));
+  link.download = artifact.fileName;
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+  return artifact.fileName;
+}
+
+async function openTiConnect() {
   if (!generated) return;
-  window.open("https://connectevo.ti.com/ticevo/en/", "_blank", "noopener");
-  downloadSource();
-  toast("Source downloaded. Use TI Connect in the new Chrome tab to select the file and send it over USB.");
+  const evo = $("#calculator").value === "TI-84 Evo";
+  if (evo) window.open("https://connectevo.ti.com/ticevo/en/", "_blank", "noopener");
+  $("#sendToCalculator").disabled = true;
+  try {
+    const fileName = await downloadCalculatorFile();
+    toast(evo ? `${fileName} is ready. Select it in TI Connect and send it over USB.` : `Downloaded calculator-ready ${fileName}`);
+  } catch (error) {
+    toast(`${error.message}. Downloading TI-BASIC source instead.`, true);
+    downloadSource();
+  } finally {
+    $("#sendToCalculator").disabled = false;
+  }
 }
 
 function currentTemplateConfig() {

@@ -204,9 +204,10 @@ Open the Builder in Google Chrome and enter the dedicated Builder password. The 
 - Configurable title, menu labels, about text, footer, fields, and program name
 - Phone/email controls in an explicitly marked advanced section; both remain off by default
 - Three private Google Sheet source indicators and an authenticated refresh action when a service account is configured
-- A Download + Open TI Connect action that opens TI Connect Evo in Chrome after saving the source fallback
+- Calculator-ready `.8xp2` output for Evo and `.8xp` output for Plus/CE, with checksum and token round-trip verification before download
+- A Download + Open TI Connect action that opens TI Connect Evo in Chrome after preparing the real program file
 
-Signatures, signature URLs, uploads, screenshots, file URLs, and raw webhook payloads are never exposed to the Builder API. Imported Sheet rows keep the values needed by Numbers, but discard private signature/upload URLs. The current exporter creates reviewed `.txt` source and deliberately does not claim direct WebUSB or `.8xp` support. TI Connect Evo owns the USB connection and file transfer in its Chrome tab.
+Signatures, signature URLs, uploads, screenshots, file URLs, and raw webhook payloads are never exposed to the Builder API. Imported Sheet rows keep the values needed by Numbers, but discard private signature/upload URLs. The browser uses the MIT-licensed `tivars_lib_cpp` engine to encode and verify real calculator containers locally; `.txt` remains available as a fallback. TI Connect Evo owns the USB connection and file transfer in its Chrome tab.
 
 `Status` is now stored in SQLite. During each live Mac sync pass, the agent reads the `Ticket ID` and `Status` columns from `All Tickets / Tickets` and reconciles recognized manual changes back to the server before program generation. It accepts the canonical statuses plus common display aliases such as `READY`, `DONE`, `WAIT CALC`, and `WAIT USER`. Set `SYNC_NUMBERS_STATUSES=false` only if Numbers should not be authoritative.
 
