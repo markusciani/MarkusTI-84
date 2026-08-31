@@ -1,8 +1,7 @@
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
 const menuDefaults = {
-  all: "ALL TICKETS", new: "NEW", working: "WORKING", ready: "READY", completed: "COMPLETED",
-  search: "SEARCH", stats: "STATS", about: "ABOUT", exit: "EXIT"
+  all: "Tickets", search: "Search", stats: "Stats", about: "About", exit: "Quit"
 };
 const apiBaseUrl = (window.TI_API_BASE_URL || window.location.origin).replace(/\/$/, "");
 let sessionToken = sessionStorage.getItem("tiBuilderSession") || "";
@@ -153,7 +152,7 @@ function renderScreen() {
   if (!generated) return;
   let lines;
   if (activePreview === "ticket" && generated.preview.firstTicket) {
-    lines = [generated.preview.firstTicket.ticketId, ...generated.preview.firstTicket.lines.slice(0, 8), "<> MOVE CLEAR BACK"];
+    lines = [generated.preview.firstTicket.ticketId, "", "1 Overview", "2 Games", "3 Programs", "4 Delivery", "5 Back"];
   } else {
     lines = [generated.preview.title, ...generated.preview.menuItems.slice(0, 9).map((item, index) => `${index + 1} ${item}`)];
   }
@@ -175,7 +174,7 @@ function renderResult(result) {
   $("#downloadButton").disabled = false;
   $("#sendToCalculator").disabled = false;
   const evo = $("#calculator").value === "TI-84 Evo";
-  $("#sendToCalculator").textContent = evo ? "DOWNLOAD .8XP2 + OPEN TI CONNECT" : "DOWNLOAD .8XP";
+  $("#sendToCalculator").textContent = evo ? "Download .8xp2 + open TI Connect" : "Download .8xp";
   $("#copySource").disabled = false;
   $("#resetSource").disabled = false;
   renderScreen();
@@ -308,9 +307,9 @@ function applyTemplate(templateConfig) {
   if (templateConfig.calculator) $("#calculator").value = templateConfig.calculator;
   if (templateConfig.programName) $("#programName").value = templateConfig.programName;
   if (templateConfig.options) {
-    $("#title").value = templateConfig.options.title || "TI TICKET LOGS";
-    $("#aboutText").value = templateConfig.options.aboutText || "TICKET SNAPSHOT - NO NETWORK REQUIRED";
-    $("#footer").value = templateConfig.options.footer || "<> MOVE CLEAR BACK";
+    $("#title").value = templateConfig.options.title || "TI Ticket Logs";
+    $("#aboutText").value = templateConfig.options.aboutText || "Offline ticket snapshot generated from the private ticket database";
+    $("#footer").value = templateConfig.options.footer || "Select a menu item";
     $$("[data-menu]").forEach((input) => { input.value = templateConfig.options.menuLabels?.[input.dataset.menu] || menuDefaults[input.dataset.menu]; });
   }
   updatePrivacyWarning();

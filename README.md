@@ -196,12 +196,15 @@ http://YOUR-SERVER/program-builder/
 Open the Builder in Google Chrome and enter the dedicated Builder password. The password is verified by the server and exchanged for an eight-hour, Builder-only session; the API secret is never exposed to the page. The Builder provides:
 
 - TI-BASIC source generation for TI-84 Evo, TI-84 Plus CE, TI-84 Plus CE Python, and TI-84 Plus / TI-83 Plus
-- One nine-item `TILOGS` menu with All, New, Working, Ready, Completed, Search, Stats, About, and Exit
-- Left/right ticket and page navigation, Clear-to-back behavior, and numeric Ticket ID search
+- A compact five-item `TILOGS` main menu with Tickets, Search, Stats, About, and Quit
+- Paged ticket menus with separate Overview, Games, Programs, Delivery, and optional Contact sections
+- Numeric Ticket ID search, including a result menu when multiple calculator families share the same number
 - Calculator, status, date, exact ID, ID range, recency-limit, and sort filters
 - A calculator-style preview, source editor, reset/copy controls, text download, size estimate, and model warning
 - Built-in templates plus browser-local saved templates
 - Configurable title, menu labels, about text, footer, fields, and program name
+- A PIN-gated Preferences menu in About that identifies the private Builder website without embedding its password in the calculator file
+- Mixed-case website and calculator labels for a friendlier, more readable design
 - Phone/email controls in an explicitly marked advanced section; both remain off by default
 - Three private Google Sheet source indicators and an authenticated refresh action when a service account is configured
 - Calculator-ready `.8xp2` output for Evo and `.8xp` output for Plus/CE, with checksum and token round-trip verification before download

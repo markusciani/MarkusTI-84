@@ -10,7 +10,7 @@
   <header class="topbar">
     <div class="brand-mark">M<span>84</span></div>
     <div>
-      <p class="eyebrow">MARKUS &amp; TI-84</p>
+      <p class="eyebrow">Markus &amp; TI-84</p>
       <h1>Calculator Program Builder</h1>
     </div>
     <div class="connection" id="connectionState"><i></i> Not connected</div>
@@ -19,22 +19,22 @@
   <main>
     <section class="auth-card browser-block hidden" id="browserBlock">
       <div>
-        <p class="eyebrow blue">GOOGLE CHROME REQUIRED</p>
+        <p class="eyebrow blue">Google Chrome required</p>
         <h2>Open this builder in Google Chrome</h2>
         <p>The calculator connection uses Chrome's USB support. Safari, Firefox, Edge, and in-app browsers are intentionally blocked.</p>
       </div>
-      <a class="button-link primary" href="https://www.google.com/chrome/">GET GOOGLE CHROME</a>
+      <a class="button-link primary" href="https://www.google.com/chrome/">Get Google Chrome</a>
     </section>
 
     <section class="auth-card" id="authCard">
       <div>
-        <p class="eyebrow blue">SECURE ACCESS</p>
+        <p class="eyebrow blue">Secure access</p>
         <h2>Unlock the ticket builder</h2>
         <p>Enter the builder password. The password is verified by the Mac server and is never stored in the page or added to calculator programs.</p>
       </div>
       <form id="authForm">
         <label>Builder password<input id="builderPassword" type="password" autocomplete="current-password" required></label>
-        <button class="primary" type="submit">UNLOCK</button>
+        <button class="primary" type="submit">Unlock</button>
       </form>
     </section>
 
@@ -42,7 +42,7 @@
       <aside class="controls">
         <section class="panel intro-panel">
           <div>
-            <p class="eyebrow blue">SNAPSHOT BUILDER</p>
+            <p class="eyebrow blue">Snapshot builder</p>
             <h2>Build TILOGS</h2>
           </div>
           <span class="ticket-count" id="databaseCount">0 tickets</span>
@@ -53,7 +53,7 @@
           <div class="section-heading"><span>↻</span><h3>Google Sheets</h3></div>
           <p id="sheetSummary">Checking the three private ticket sheets…</p>
           <div class="source-list" id="sheetSources"></div>
-          <div class="inline-actions"><button id="syncSheets" class="quiet" type="button">SYNC SHEETS NOW</button></div>
+          <div class="inline-actions"><button id="syncSheets" class="quiet" type="button">Sync sheets now</button></div>
         </section>
 
         <section class="panel form-panel">
@@ -64,7 +64,7 @@
             <label>Program name<input id="programName" value="TILOGS" maxlength="8" spellcheck="false"></label>
             <label>Template<select id="template"><option value="">Custom</option></select></label>
           </div>
-          <div class="inline-actions"><button id="saveTemplate" class="quiet" type="button">SAVE TEMPLATE</button></div>
+          <div class="inline-actions"><button id="saveTemplate" class="quiet" type="button">Save template</button></div>
         </section>
 
         <section class="panel form-panel">
@@ -95,7 +95,7 @@
             <label><input type="checkbox" data-field="submittedDate" checked>Submitted Date</label>
           </div>
           <details class="advanced privacy">
-            <summary>Advanced private fields <span>OFF BY DEFAULT</span></summary>
+            <summary>Advanced private fields <span>Off by default</span></summary>
             <p>Anything enabled here will be embedded permanently in the exported source snapshot.</p>
             <div class="check-grid">
               <label><input type="checkbox" data-field="phone">Phone</label>
@@ -107,9 +107,9 @@
         <section class="panel form-panel">
           <div class="section-heading"><span>04</span><h3>Editor settings</h3></div>
           <div class="form-grid">
-            <label>Title<input id="title" value="TI TICKET LOGS" maxlength="26"></label>
-            <label>About text<textarea id="aboutText" rows="3">TICKET SNAPSHOT - NO NETWORK REQUIRED</textarea></label>
-            <label>Footer<input id="footer" value="&lt;&gt; MOVE CLEAR BACK" maxlength="26"></label>
+            <label>Title<input id="title" value="TI Ticket Logs" maxlength="26"></label>
+            <label>About text<textarea id="aboutText" rows="3">Offline ticket snapshot generated from the private ticket database</textarea></label>
+            <label>Footer<input id="footer" value="Select a menu item" maxlength="26"></label>
           </div>
           <details class="advanced">
             <summary>Customize menu options</summary>
@@ -118,31 +118,28 @@
         </section>
 
         <div class="sticky-actions">
-          <button id="previewButton" class="secondary" type="button">PREVIEW</button>
-          <button id="generateButton" class="primary" type="button">GENERATE</button>
-          <button id="downloadButton" class="download" type="button" disabled>DOWNLOAD SOURCE</button>
-          <button id="sendToCalculator" class="primary" type="button" disabled>DOWNLOAD CALCULATOR FILE</button>
+          <button id="previewButton" class="secondary" type="button">Preview</button>
+          <button id="generateButton" class="primary" type="button">Generate</button>
+          <button id="downloadButton" class="download" type="button" disabled>Download source</button>
+          <button id="sendToCalculator" class="primary" type="button" disabled>Download calculator file</button>
         </div>
       </aside>
 
       <section class="output-column">
         <section class="panel output-panel">
           <div class="output-header">
-            <div><p class="eyebrow blue">CALCULATOR PREVIEW</p><h2 id="previewTitle">TI TICKET LOGS</h2></div>
-            <div class="view-toggle"><button class="active" data-view="menu">MENU</button><button data-view="ticket">TICKET</button></div>
+            <div><p class="eyebrow blue">Calculator preview</p><h2 id="previewTitle">TI Ticket Logs</h2></div>
+            <div class="view-toggle"><button class="active" data-view="menu">Menu</button><button data-view="ticket">Ticket</button></div>
           </div>
           <div class="calculator-shell">
             <div class="calculator-top"><span>TI-84</span><strong>EVO</strong></div>
-            <pre class="screen" id="screenPreview">TI TICKET LOGS
+            <pre class="screen" id="screenPreview">TI Ticket Logs
 
-1 ALL TICKETS
-2 NEW
-3 WORKING
-4 READY
-5 COMPLETED
-6 SEARCH
-
-9 EXIT</pre>
+1 Tickets
+2 Search
+3 Stats
+4 About
+5 Quit</pre>
             <div class="keypad"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
           </div>
           <div class="metrics">
@@ -156,13 +153,13 @@
 
         <section class="panel source-panel">
           <div class="output-header">
-            <div><p class="eyebrow">ADVANCED MODE</p><h2>Generated TI-BASIC source</h2></div>
+            <div><p class="eyebrow">Advanced mode</p><h2>Generated TI-BASIC source</h2></div>
             <span id="editState">Generated source</span>
           </div>
           <textarea id="sourceEditor" spellcheck="false" placeholder="Generate a preview to inspect the TI-BASIC source."></textarea>
           <div class="inline-actions source-actions">
-            <button id="resetSource" class="quiet" type="button" disabled>RESET GENERATED SOURCE</button>
-            <button id="copySource" class="quiet" type="button" disabled>COPY SOURCE</button>
+            <button id="resetSource" class="quiet" type="button" disabled>Reset generated source</button>
+            <button id="copySource" class="quiet" type="button" disabled>Copy source</button>
           </div>
         </section>
       </section>

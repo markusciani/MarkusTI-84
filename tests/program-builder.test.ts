@@ -35,10 +35,10 @@ const request: GenerateProgramRequest = {
 };
 
 test("calculator-safe formatter removes unsupported text and enforces program names", () => {
-  assert.equal(calculatorSafeText("Pokémon 😀 “Blue”"), "POKEMON 'BLUE'");
+  assert.equal(calculatorSafeText("Pokémon 😀 “Blue”"), "Pokemon 'Blue'");
   assert.equal(calculatorSafeText("SAFE! {NOT} \\ TEXT"), "SAFE NOT TEXT");
-  assert.equal(shortStatus("Waiting for Calculator"), "WAIT CALC");
-  assert.equal(shortStatus("Ready for Delivery"), "READY");
+  assert.equal(shortStatus("Waiting for Calculator"), "Wait Calc");
+  assert.equal(shortStatus("Ready for Delivery"), "Ready");
   assert.equal(validProgramName("42 logs"), "P42LOGS");
   assert.equal(validProgramName("really-long-name"), "REALLYLO");
   assert.ok(wrapCalculatorText("A VERY LONG GAME NAME", 8).every((line) => line.length <= 8));
@@ -50,24 +50,31 @@ test("filters calculator, status, date, ID range, order, and limit", () => {
   assert.deepEqual(filterTickets(tickets, { dateFrom: "2026-08-30", ticketIdFrom: "EVO-0042", ticketIdTo: "EVO-0043", sort: "ticket-id" }).map((ticket) => ticket.ticketId), ["EVO-0042", "EVO-0043"]);
 });
 
-test("generates menu, ticket navigation, numeric search, stats, and privacy-safe TI-BASIC", () => {
+test("generates five-item main menu, ticket submenus, search, stats, about, and privacy-safe TI-BASIC", () => {
   const result = buildProgram(request, tickets);
   assert.equal(result.programName, "TILOGS");
   assert.equal(result.ticketCount, 3);
-  assert.match(result.source, /:Menu\("TI TICKET LOGS"/);
-  assert.match(result.source, /:Repeat K=24 or K=26 or K=45/);
-  assert.match(result.source, /:Lbl Z\n:Goto M/);
-  assert.match(result.source, /:Input "TICKET NUMBER:",N/);
-  assert.match(result.source, /:If N=42\n:Then\n:\{2,3\}→L₁|:If N=42\n:Then\n:\{1,2\}→L₁/);
-  assert.match(result.source, /:Disp "READY: 1"/);
-  assert.match(result.source, /POKEMON/);
-  assert.doesNotMatch(result.source, /555-0100|JOSE@EXAMPLE\.COM/);
+  assert.match(result.source, /:Menu\("TI Ticket Logs","Tickets",A,"Search",S,"Stats",T,"About",B,"Quit",X\)/);
+  assert.doesNotMatch(result.source, /"New",|"Working",|"Completed",/);
+  assert.match(result.source, /:Menu\("EVO-0042","Overview",[A-Z]{2},"Games",[A-Z]{2},"Programs",[A-Z]{2},"Delivery",[A-Z]{2},"Back",[A-Z]{2}\)/);
+  assert.match(result.source, /:Menu\("Games 1\/1","Pokemon",[A-Z]{2},"Snake",[A-Z]{2},"Tetris",[A-Z]{2},"Ticket",[A-Z]{2}\)/);
+  assert.match(result.source, /:Menu\("Programs 1\/1","Quadratic Formula",[A-Z]{2},"Radical Simplifier",[A-Z]{2},"Ticket",[A-Z]{2}\)/);
+  assert.match(result.source, /:Input "Ticket number:",N/);
+  assert.match(result.source, /:If N=42\n:Goto [A-Z]{2}/);
+  assert.match(result.source, /:Disp "Ticket not found"\n:Pause \n:Goto M\n:Lbl [A-Z]{2}\n:Menu\("TICKET 42"/);
+  assert.match(result.source, /:Disp "Ticket stats"/);
+  assert.doesNotMatch(result.source, /READY:|WORKING:|COMPLETED:/);
+  assert.match(result.source, /"Preferences",[A-Z]{2}/);
+  assert.match(result.source, /:Input "Admin PIN:",Z\n:If Z=2010/);
+  assert.match(result.source, /:Disp "Password not stored"/);
+  assert.match(result.source, /:Disp "ti-ticket-builder"\n:Disp "dot pages dot dev"/);
+  assert.doesNotMatch(result.source, /555-0100|jose@example\.com/i);
   assert.ok(result.estimatedBytes > 0);
 });
 
 test("advanced phone and email fields are included only when explicitly enabled", () => {
   const result = buildProgram({ ...request, fields: { ...request.fields, phone: true, email: true } }, [tickets[0]]);
-  assert.match(result.source, /PHONE: 555-0100/);
-  assert.match(result.source, /EMAIL:/);
-  assert.match(result.source, /JOSE@EXAMPLE\.COM/);
+  assert.match(result.source, /Phone: 555-0100/);
+  assert.match(result.source, /Email:/);
+  assert.match(result.source, /jose@example\.com/);
 });

@@ -1,8 +1,8 @@
 const STATUS_NAMES: Record<string, string> = {
-  "WAITING FOR CALCULATOR": "WAIT CALC",
-  "WAITING FOR USER": "WAIT USER",
-  "READY FOR DELIVERY": "READY",
-  "COMPLETED": "DONE"
+  "WAITING FOR CALCULATOR": "Wait Calc",
+  "WAITING FOR USER": "Wait User",
+  "READY FOR DELIVERY": "Ready",
+  "COMPLETED": "Done"
 };
 
 export function calculatorSafeText(value: unknown, maxLength = 26): string {
@@ -16,14 +16,13 @@ export function calculatorSafeText(value: unknown, maxLength = 26): string {
     .replace(/"/g, "'")
     .replace(/[^A-Z0-9 .,:;?'@#+\-/%&()<>_=]/gi, "")
     .replace(/\s+/g, " ")
-    .trim()
-    .toUpperCase();
+    .trim();
   return ascii.slice(0, Math.max(0, maxLength));
 }
 
 export function shortStatus(status: string): string {
   const safe = calculatorSafeText(status, 26);
-  return STATUS_NAMES[safe] ?? safe;
+  return STATUS_NAMES[safe.toUpperCase()] ?? safe;
 }
 
 export function wrapCalculatorText(value: unknown, width = 26, maxLines = 12): string[] {
@@ -45,7 +44,7 @@ export function wrapCalculatorText(value: unknown, width = 26, maxLines = 12): s
 }
 
 export function validProgramName(value: string, maxLength = 8): string {
-  const safe = calculatorSafeText(value, 128).replace(/[^A-Z0-9]/g, "");
+  const safe = calculatorSafeText(value, 128).toUpperCase().replace(/[^A-Z0-9]/g, "");
   const withLetter = /^[A-Z]/.test(safe) ? safe : `P${safe}`;
   return (withLetter || "TILOGS").slice(0, maxLength);
 }
