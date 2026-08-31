@@ -50,20 +50,22 @@
         </section>
 
         <section class="panel sheet-panel">
-          <div class="section-heading"><span>↻</span><h3>Google Sheets</h3></div>
+          <div class="panel-heading-row">
+            <div class="section-heading"><span>↻</span><h3>Google Sheets</h3></div>
+            <button id="syncSheets" class="quiet refresh-button" type="button">Refresh Google Sheets</button>
+          </div>
           <p id="sheetSummary">Checking the three private ticket sheets…</p>
-          <div class="source-list" id="sheetSources"></div>
-          <div class="inline-actions"><button id="syncSheets" class="quiet" type="button">Sync sheets now</button></div>
+          <details class="source-details"><summary>View connected sheets</summary><div class="source-list" id="sheetSources"></div></details>
         </section>
 
         <section class="panel form-panel">
           <div class="section-heading"><span>01</span><h3>Program</h3></div>
           <div class="form-grid two">
             <label>Calculator<select id="calculator"></select></label>
-            <label>Format<select id="format"><option value="ti-basic">TI-BASIC source</option></select></label>
             <label>Program name<input id="programName" value="TILOGS" maxlength="8" spellcheck="false"></label>
             <label>Template<select id="template"><option value="">Custom</option></select></label>
           </div>
+          <input id="format" type="hidden" value="ti-basic">
           <div class="inline-actions"><button id="saveTemplate" class="quiet" type="button">Save template</button></div>
         </section>
 
@@ -72,14 +74,19 @@
           <div class="form-grid two">
             <label>Ticket calculator<select id="filterCalculator"><option value="">All calculators</option></select></label>
             <label>Maximum tickets<input id="limit" type="number" min="1" max="50" value="20" list="limitChoices"><datalist id="limitChoices"><option value="5"><option value="10"><option value="20"><option value="30"><option value="50"></datalist></label>
-            <label>From date<input id="dateFrom" type="date"></label>
-            <label>To date<input id="dateTo" type="date"></label>
-            <label>Exact Ticket ID<input id="ticketId" placeholder="EVO-0042" spellcheck="false"></label>
             <label>Sort<select id="sort"><option value="newest">Newest First</option><option value="oldest">Oldest First</option><option value="ticket-id">Ticket ID</option></select></label>
-            <label>ID range from<input id="ticketIdFrom" placeholder="EVO-0040" spellcheck="false"></label>
-            <label>ID range to<input id="ticketIdTo" placeholder="EVO-0050" spellcheck="false"></label>
           </div>
-          <fieldset><legend>Status filters <small>None selected means all</small></legend><div class="chip-grid" id="statusFilters"></div></fieldset>
+          <details class="advanced ticket-filters">
+            <summary>More ticket filters</summary>
+            <div class="form-grid two">
+              <label>From date<input id="dateFrom" type="date"></label>
+              <label>To date<input id="dateTo" type="date"></label>
+              <label>Exact Ticket ID<input id="ticketId" placeholder="EVO-0042" spellcheck="false"></label>
+              <label>ID range from<input id="ticketIdFrom" placeholder="EVO-0040" spellcheck="false"></label>
+              <label>ID range to<input id="ticketIdTo" placeholder="EVO-0050" spellcheck="false"></label>
+            </div>
+            <fieldset><legend>Status filters <small>None selected means all</small></legend><div class="chip-grid" id="statusFilters"></div></fieldset>
+          </details>
         </section>
 
         <section class="panel form-panel">
@@ -104,8 +111,8 @@
           </details>
         </section>
 
-        <section class="panel form-panel">
-          <div class="section-heading"><span>04</span><h3>Editor settings</h3></div>
+        <details class="panel form-panel collapsible-panel">
+          <summary><span class="summary-number">04</span><strong>Customize program text</strong></summary>
           <div class="form-grid">
             <label>Title<input id="title" value="TI Ticket Logs" maxlength="26"></label>
             <label>About text<textarea id="aboutText" rows="3">Offline ticket snapshot generated from the private ticket database</textarea></label>
@@ -115,7 +122,7 @@
             <summary>Customize menu options</summary>
             <div class="form-grid three" id="menuLabels"></div>
           </details>
-        </section>
+        </details>
 
         <div class="sticky-actions">
           <button id="previewButton" class="secondary" type="button">Preview</button>
@@ -151,17 +158,14 @@
           <p class="privacy-warning hidden" id="privacyWarning">Private fields are enabled and will be embedded in this calculator snapshot.</p>
         </section>
 
-        <section class="panel source-panel">
-          <div class="output-header">
-            <div><p class="eyebrow">Advanced mode</p><h2>Generated TI-BASIC source</h2></div>
-            <span id="editState">Generated source</span>
-          </div>
+        <details class="panel source-panel collapsible-panel">
+          <summary><span><span class="eyebrow">Advanced mode</span><strong>View generated TI-BASIC source</strong></span><span id="editState">Generated source</span></summary>
           <textarea id="sourceEditor" spellcheck="false" placeholder="Generate a preview to inspect the TI-BASIC source."></textarea>
           <div class="inline-actions source-actions">
             <button id="resetSource" class="quiet" type="button" disabled>Reset generated source</button>
             <button id="copySource" class="quiet" type="button" disabled>Copy source</button>
           </div>
-        </section>
+        </details>
       </section>
     </section>
   </main>

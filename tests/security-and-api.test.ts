@@ -80,7 +80,10 @@ test("program builder UI is public but ticket data and generation remain authent
   const port = (server.address() as AddressInfo).port;
   const page = await fetch(`http://127.0.0.1:${port}/program-builder/`);
   assert.equal(page.status, 200);
-  assert.match(await page.text(), /Calculator Program Builder/);
+  const pageHtml = await page.text();
+  assert.match(pageHtml, /Calculator Program Builder/);
+  assert.match(pageHtml, /id="syncSheets"[^>]*>Refresh Google Sheets/);
+  assert.doesNotMatch(pageHtml, /id="syncSheets"[^>]*disabled/);
   const denied = await fetch(`http://127.0.0.1:${port}/api/program-builder/tickets`);
   assert.equal(denied.status, 401);
   const config = await fetch(`http://127.0.0.1:${port}/api/program-builder/config`, { headers: { authorization: "Bearer api-test" } });

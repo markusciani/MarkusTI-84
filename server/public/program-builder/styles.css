@@ -44,6 +44,12 @@ main { width: min(1460px, calc(100% - 36px)); margin: 30px auto 70px; }
 .intro-panel p:last-child { grid-column: 1 / -1; margin: 8px 0 0; color: var(--muted); }
 .ticket-count { color: var(--blue); background: #eaf3ff; border-radius: 999px; padding: 6px 10px; height: fit-content; font-size: 12px; font-weight: 800; }
 .sheet-panel > p { color: var(--muted); margin-bottom: 12px; }
+.panel-heading-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+.panel-heading-row .section-heading { margin-bottom: 0; }
+.refresh-button { flex: 0 0 auto; color: var(--blue); border-color: #b9d6fb; background: #f3f8ff; }
+.source-details { color: var(--muted); font-size: 12px; }
+.source-details summary { cursor: pointer; font-weight: 700; }
+.source-details[open] summary { margin-bottom: 9px; }
 .source-list { display: grid; gap: 7px; }
 .source-list div { display: flex; align-items: center; gap: 8px; padding: 9px 10px; border-radius: 10px; background: #f7f8fa; color: #4d555e; font-size: 12px; font-weight: 700; }
 .source-list i { width: 8px; height: 8px; border-radius: 50%; background: #2db364; }
@@ -72,6 +78,15 @@ legend small { margin-left: 8px; color: #969da5; font-weight: 500; }
 .advanced summary span { float: right; color: #a05c00; font-size: 9px; background: #fff1da; padding: 3px 6px; border-radius: 6px; }
 .advanced .form-grid, .advanced .check-grid { margin-top: 14px; }
 .advanced p { color: var(--muted); font-size: 12px; }
+.ticket-filters .form-grid { margin-top: 14px; }
+.collapsible-panel > summary { display: flex; align-items: center; justify-content: space-between; gap: 14px; list-style: none; cursor: pointer; color: #33393f; }
+.collapsible-panel > summary::-webkit-details-marker { display: none; }
+.collapsible-panel > summary::after { content: "+"; margin-left: auto; color: var(--blue); font-size: 21px; font-weight: 500; }
+.collapsible-panel[open] > summary::after { content: "−"; }
+.collapsible-panel[open] > summary { margin-bottom: 20px; }
+.collapsible-panel > summary strong { font-size: 15px; }
+.summary-number { display: inline-grid; place-items: center; width: 30px; height: 30px; margin-right: 10px; border-radius: 9px; color: white; background: var(--black); font-size: 11px; }
+.source-panel > summary #editState { margin-left: auto; }
 button { border: 0; border-radius: 10px; padding: 11px 15px; font-weight: 800; font-size: 11px; letter-spacing: .04em; }
 .primary { background: var(--blue); color: white; box-shadow: 0 7px 18px rgba(6,105,237,.22); }
 .primary:hover { background: var(--blue-dark); }

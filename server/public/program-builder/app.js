@@ -12,6 +12,7 @@ let generatedSource = "";
 let manualEdited = false;
 let activePreview = "menu";
 let tiFileEnginePromise = null;
+let sheetImportConfigured = false;
 const TI_FILE_ENGINE_URL = "https://cdn.jsdelivr.net/gh/adriweb/tivars_lib_cpp@0d3bca2e081a273784e5cc0c139179177e76f969/TIVarsLib.js";
 
 function toast(message, error = false) {
@@ -102,6 +103,7 @@ async function connect() {
 }
 
 function renderSheetStatus(status) {
+  sheetImportConfigured = Boolean(status.configured);
   $("#sheetSources").replaceChildren(...status.sources.map((source) => {
     const row = document.createElement("div");
     row.innerHTML = "<i></i>";
@@ -109,9 +111,9 @@ function renderSheetStatus(status) {
     return row;
   }));
   $("#sheetSummary").textContent = status.configured
-    ? "Private server access is configured. New rows can be synchronized here."
-    : "Historical rows are loaded. Future responses continue through the Tally webhooks; private automatic Sheet refresh still needs a Google service account.";
-  $("#syncSheets").disabled = !status.configured;
+    ? "Ready to import new responses from all three sheets."
+    : "Webhook tickets are current. Direct Sheet import needs private Google access, but this button can still refresh the ticket list.";
+  $("#syncSheets").disabled = false;
 }
 
 function selectedFields() {
@@ -339,14 +341,29 @@ $("#generateButton").addEventListener("click", () => runBuilder("generate"));
 $("#downloadButton").addEventListener("click", downloadSource);
 $("#sendToCalculator").addEventListener("click", openTiConnect);
 $("#syncSheets").addEventListener("click", async () => {
+  const button = $("#syncSheets");
   try {
-    $("#syncSheets").disabled = true;
-    const result = await api("/api/google-sheets/import", { method: "POST", body: "{}" });
-    toast(`Sheets synchronized: ${result.imported} new, ${result.duplicates} already loaded`);
-    await connect();
+    button.disabled = true;
+    button.textContent = "Refreshing…";
+    let message = "Ticket list refreshed from the webhook database";
+    if (sheetImportConfigured) {
+      const result = await api("/api/google-sheets/import", { method: "POST", body: "{}" });
+      message = `Sheets refreshed: ${result.imported} new, ${result.duplicates} already loaded`;
+    }
+    const [{ tickets: refreshedTickets }, sheetStatus] = await Promise.all([
+      api("/api/program-builder/tickets"), api("/api/google-sheets/status")
+    ]);
+    tickets = refreshedTickets;
+    window.tickets = tickets;
+    $("#databaseCount").textContent = `${tickets.length} ticket${tickets.length === 1 ? "" : "s"}`;
+    renderSheetStatus(sheetStatus);
+    await runBuilder("preview", false);
+    toast(message);
   } catch (error) {
     toast(error.message, true);
-    $("#syncSheets").disabled = false;
+  } finally {
+    button.disabled = false;
+    button.textContent = "Refresh Google Sheets";
   }
 });
 $("#copySource").addEventListener("click", async () => {
