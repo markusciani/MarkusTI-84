@@ -46,7 +46,7 @@
             <h2>Build TILOGS</h2>
           </div>
           <span class="ticket-count" id="databaseCount">0 tickets</span>
-          <p>Creates an offline TI-BASIC snapshot. No phone, email, signatures, uploads, or raw webhook data are included by default.</p>
+          <p>Creates an offline TI-BASIC snapshot with the selected contact and service details. Signatures, uploads, screenshots, and raw webhook data are never included.</p>
         </section>
 
         <section class="panel sheet-panel">
@@ -100,15 +100,10 @@
             <label><input type="checkbox" data-field="programs" checked>Programs</label>
             <label><input type="checkbox" data-field="delivery" checked>Delivery</label>
             <label><input type="checkbox" data-field="submittedDate" checked>Submitted Date</label>
+            <label><input type="checkbox" data-field="phone" checked>Phone</label>
+            <label><input type="checkbox" data-field="email" checked>Email</label>
+            <label><input type="checkbox" data-field="details" checked>Service details</label>
           </div>
-          <details class="advanced privacy">
-            <summary>Advanced private fields <span>Off by default</span></summary>
-            <p>Anything enabled here will be embedded permanently in the exported source snapshot.</p>
-            <div class="check-grid">
-              <label><input type="checkbox" data-field="phone">Phone</label>
-              <label><input type="checkbox" data-field="email">Email</label>
-            </div>
-          </details>
         </section>
 
         <details class="panel form-panel collapsible-panel">
@@ -154,7 +149,7 @@
             <div><span>Output</span><strong>TI-BASIC</strong></div>
           </div>
           <p class="warning hidden" id="sizeWarning"></p>
-          <p class="privacy-warning hidden" id="privacyWarning">Private fields are enabled and will be embedded in this calculator snapshot.</p>
+          <p class="privacy-warning hidden" id="privacyWarning">Phone and email are enabled and will be embedded in this calculator snapshot.</p>
         </section>
 
         <details class="panel source-panel collapsible-panel">

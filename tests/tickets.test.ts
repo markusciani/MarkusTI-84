@@ -50,7 +50,11 @@ test("ticket status is stored for program-builder filters and can be updated", (
   const service = new TicketService(db, formConfigs);
   const config = formConfigs.find((item) => item.formType === "evo")!;
   const created = service.create(fixture("tally-evo.json"), config);
-  assert.equal(service.listForProgramBuilder()[0].status, "New");
+  const builderTicket = service.listForProgramBuilder()[0];
+  assert.equal(builderTicket.status, "New");
+  assert.equal(builderTicket.grade, "Junior");
+  assert.equal(builderTicket.python, "Yes");
+  assert.equal(builderTicket.cleanCase, "Yes");
   assert.equal(service.updateStatus(created.id, "Ready for Delivery"), true);
   assert.equal(service.listForProgramBuilder()[0].status, "Ready for Delivery");
   db.close();

@@ -122,6 +122,18 @@ export class TicketService {
     programs: string[];
     delivery: string;
     submittedAt: string;
+    grade: string;
+    version: string;
+    python: string;
+    caseIncluded: string;
+    chargerIncluded: string;
+    cleanCase: string;
+    background: string;
+    dateTimeCurrent: string;
+    gameLauncherMethod: string;
+    existingLauncherName: string;
+    appsToRemove: string;
+    programsToRemove: string;
   }> {
     const rows = this.db.prepare("SELECT * FROM tickets ORDER BY submitted_at DESC, id DESC").all() as unknown as TicketRow[];
     return rows.map((row) => {
@@ -137,7 +149,19 @@ export class TicketService {
         games: ticket.games,
         programs: ticket.programs,
         delivery: String(ticket.delivery.option ?? ""),
-        submittedAt: ticket.submittedAt
+        submittedAt: ticket.submittedAt,
+        grade: ticket.person.grade,
+        version: ticket.calculator.version,
+        python: ticket.calculator.python,
+        caseIncluded: ticket.calculator.caseIncluded,
+        chargerIncluded: ticket.calculator.chargerIncluded,
+        cleanCase: String(ticket.options.cleanCase ?? ""),
+        background: String(ticket.options.background ?? ""),
+        dateTimeCurrent: String(ticket.options.dateTimeCurrent ?? ""),
+        gameLauncherMethod: String(ticket.options.gameLauncherMethod ?? ""),
+        existingLauncherName: String(ticket.options.existingLauncherName ?? ""),
+        appsToRemove: String(ticket.options.appsToRemove ?? ""),
+        programsToRemove: String(ticket.options.programsToRemove ?? "")
       };
     });
   }

@@ -3,7 +3,7 @@ export type ProgramFormat = typeof PROGRAM_FORMATS[number];
 
 export const BUILDER_FIELD_KEYS = [
   "ticketId", "firstName", "calculator", "status", "games", "programs",
-  "delivery", "submittedDate", "phone", "email"
+  "delivery", "submittedDate", "phone", "email", "details"
 ] as const;
 export type BuilderFieldKey = typeof BUILDER_FIELD_KEYS[number];
 
@@ -24,6 +24,18 @@ export interface CalculatorTicket {
   programs: string[];
   delivery: string;
   submittedAt: string;
+  grade?: string;
+  version?: string;
+  python?: string;
+  caseIncluded?: string;
+  chargerIncluded?: string;
+  cleanCase?: string;
+  background?: string;
+  dateTimeCurrent?: string;
+  gameLauncherMethod?: string;
+  existingLauncherName?: string;
+  appsToRemove?: string;
+  programsToRemove?: string;
 }
 
 export interface BuilderFilters {

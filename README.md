@@ -198,7 +198,8 @@ Open the Builder in Google Chrome and enter the dedicated Builder password. The 
 - TI-BASIC source generation for TI-84 Evo, TI-84 Plus CE, TI-84 Plus CE Python, and TI-84 Plus / TI-83 Plus
 - A compact five-item `TILOGS` main menu with Tickets, Search, Stats, System, and Quit
 - Ticket lists show each Ticket ID beside the customer's first name
-- Ticket sections include Overview, full-screen plain-text Games pages, Programs, Delivery, and optional Contact
+- Ticket sections include Overview, full-screen plain-text Games and Programs pages, Delivery, and paged Details
+- Details can include phone, email, grade, version, Python status, case/charger, cleaning, background, launcher, and removal requests
 - Numeric Ticket ID search, including a result menu when multiple calculator families share the same number
 - Calculator, status, date, exact ID, ID range, recency-limit, and sort filters
 - A calculator-style preview, source editor, reset/copy controls, text download, size estimate, and model warning
@@ -206,7 +207,7 @@ Open the Builder in Google Chrome and enter the dedicated Builder password. The 
 - Configurable title, menu labels, about text, footer, fields, and program name
 - A PIN-gated System screen that shows the private Builder website and password together
 - Mixed-case website and calculator labels for a friendlier, more readable design
-- Phone/email controls in an explicitly marked advanced section; both remain off by default
+- Phone, email, and service details are selected by default and can be excluded before generation
 - Three private Google Sheet source indicators and an authenticated refresh action when a service account is configured
 - Calculator-ready `.8xp2` output for Evo and `.8xp` output for Plus/CE, with checksum and token round-trip verification before download
 - A Download + Open TI Connect action that opens TI Connect Evo in Chrome after preparing the real program file

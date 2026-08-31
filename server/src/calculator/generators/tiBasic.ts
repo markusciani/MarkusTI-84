@@ -46,6 +46,30 @@ function textPages(values: string[], width: number, linesPerPage: number): strin
     lines.slice(page * linesPerPage, page * linesPerPage + linesPerPage));
 }
 
+function detailPages(ticket: CalculatorTicket, fields: BuilderFields, width: number, linesPerPage: number): string[][] {
+  const details: string[] = [];
+  if (enabled(fields, "phone", true)) details.push(`Phone: ${ticket.phone || "None"}`);
+  if (enabled(fields, "email", true)) details.push(`Email: ${ticket.email || "None"}`);
+  if (enabled(fields, "details")) {
+    const add = (label: string, value: string | undefined) => { if (value?.trim()) details.push(`${label}: ${value}`); };
+    add("Grade", ticket.grade);
+    add("Version", ticket.version);
+    add("Python", ticket.python);
+    add("Case", ticket.caseIncluded);
+    add("Charger", ticket.chargerIncluded);
+    add("Clean case", ticket.cleanCase);
+    add("Background", ticket.background);
+    add("Date/time", ticket.dateTimeCurrent);
+    add("Launcher", ticket.gameLauncherMethod);
+    add("Launcher app", ticket.existingLauncherName);
+    add("Remove apps", ticket.appsToRemove);
+    add("Remove programs", ticket.programsToRemove);
+  }
+  const lines = (details.length ? details : ["No extra details"]).flatMap((line) => wrapCalculatorText(line, width, 100));
+  return Array.from({ length: Math.ceil(lines.length / linesPerPage) }, (_, page) =>
+    lines.slice(page * linesPerPage, page * linesPerPage + linesPerPage));
+}
+
 function pagedText(input: { title: string; pages: string[][]; pageLabels: string[]; returnLabel: string }): string[] {
   return input.pages.flatMap((lines, page) => [
     `:Lbl ${input.pageLabels[page]}`,
@@ -55,24 +79,6 @@ function pagedText(input: { title: string; pages: string[][]; pageLabels: string
     ":Pause ",
     `:Goto ${page + 1 < input.pages.length ? input.pageLabels[page + 1] : input.returnLabel}`
   ]);
-}
-
-function pagedMenu(input: { title: string; values: string[]; pageLabels: string[]; returnLabel: string }): string[] {
-  const pageSize = 4;
-  const pages = Math.max(1, Math.ceil(input.values.length / pageSize));
-  const source: string[] = [];
-  for (let page = 0; page < pages; page += 1) {
-    const label = input.pageLabels[page];
-    const values = input.values.slice(page * pageSize, page * pageSize + pageSize);
-    const items: Array<[string, string]> = values.length ? values.map((value) => [value, label]) : [["None requested", label]];
-    if (pages > 1) {
-      items.push(["Next", page + 1 < pages ? input.pageLabels[page + 1] : input.returnLabel]);
-      items.push(["Previous", page > 0 ? input.pageLabels[page - 1] : input.returnLabel]);
-    }
-    items.push(["Ticket", input.returnLabel]);
-    source.push(`:Lbl ${label}`, menuLine(`${input.title} ${page + 1}/${pages}`, items));
-  }
-  return source;
 }
 
 export function generateTiBasic(input: {
@@ -97,11 +103,14 @@ export function generateTiBasic(input: {
   const ticketMenuLabels = tickets.map(() => allocate());
   const overviewLabels = tickets.map(() => allocate());
   const deliveryLabels = tickets.map(() => allocate());
-  const contactLabels = tickets.map(() => allocate());
   const listPages = Array.from({ length: Math.max(1, Math.ceil(tickets.length / 4)) }, () => allocate());
-  const gameTextPages = tickets.map((ticket) => textPages(ticket.games, model.displayColumns, Math.max(1, model.displayRows - 2)));
+  const linesPerPage = Math.max(1, model.displayRows - 2);
+  const gameTextPages = tickets.map((ticket) => textPages(ticket.games, model.displayColumns, linesPerPage));
   const gamePages = gameTextPages.map((pages) => Array.from({ length: pages.length }, () => allocate()));
-  const programPages = tickets.map((ticket) => Array.from({ length: Math.max(1, Math.ceil(ticket.programs.length / 4)) }, () => allocate()));
+  const programTextPages = tickets.map((ticket) => textPages(ticket.programs, model.displayColumns, linesPerPage));
+  const programPages = programTextPages.map((pages) => Array.from({ length: pages.length }, () => allocate()));
+  const ticketDetailPages = tickets.map((ticket) => detailPages(ticket, fields, model.displayColumns, linesPerPage));
+  const detailsPages = ticketDetailPages.map((pages) => Array.from({ length: pages.length }, () => allocate()));
   const systemPage = allocate();
 
   const source: string[] = [
@@ -130,7 +139,7 @@ export function generateTiBasic(input: {
     if (enabled(fields, "games")) sections.push(["Games", gamePages[index][0]]);
     if (enabled(fields, "programs")) sections.push(["Programs", programPages[index][0]]);
     if (enabled(fields, "delivery")) sections.push(["Delivery", deliveryLabels[index]]);
-    if (enabled(fields, "phone", false) || enabled(fields, "email", false)) sections.push(["Contact", contactLabels[index]]);
+    if (enabled(fields, "phone", true) || enabled(fields, "email", true) || enabled(fields, "details")) sections.push(["Details", detailsPages[index][0]]);
     sections.push(["Back", listPages[Math.floor(index / 4)]]);
     source.push(`:Lbl ${ticketMenu}`, menuLine(ticket.ticketId, sections));
 
@@ -141,14 +150,11 @@ export function generateTiBasic(input: {
     if (enabled(fields, "submittedDate")) overview.push(`Date: ${ticket.submittedAt.slice(0, 10)}`);
     source.push(`:Lbl ${overviewLabels[index]}`, ...displayScreen(ticket.ticketId, overview, ticketMenu, model.displayRows));
     source.push(...pagedText({ title: "Games", pages: gameTextPages[index], pageLabels: gamePages[index], returnLabel: ticketMenu }));
-    source.push(...pagedMenu({ title: "Programs", values: ticket.programs, pageLabels: programPages[index], returnLabel: ticketMenu }));
+    source.push(...pagedText({ title: "Programs", pages: programTextPages[index], pageLabels: programPages[index], returnLabel: ticketMenu }));
 
     const delivery = wrapCalculatorText(ticket.delivery || "No delivery option", model.displayColumns, model.displayRows - 2);
     source.push(`:Lbl ${deliveryLabels[index]}`, ...displayScreen("Delivery", delivery, ticketMenu, model.displayRows));
-    const contact: string[] = [];
-    if (enabled(fields, "phone", false)) contact.push(`Phone: ${ticket.phone || "None"}`);
-    if (enabled(fields, "email", false)) contact.push(...wrapCalculatorText(`Email: ${ticket.email || "None"}`, model.displayColumns, 4));
-    source.push(`:Lbl ${contactLabels[index]}`, ...displayScreen("Private contact", contact, ticketMenu, model.displayRows));
+    source.push(...pagedText({ title: "Details", pages: ticketDetailPages[index], pageLabels: detailsPages[index], returnLabel: ticketMenu }));
   });
 
   source.push(":Lbl S", ":ClrHome", ':Input "Ticket number:",N');

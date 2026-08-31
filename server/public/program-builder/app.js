@@ -68,6 +68,7 @@ function renderConfig() {
   template.replaceChildren(option("", "Custom"), ...config.templates.map((item) => option(`builtin:${item.id}`, item.name)));
   loadSavedTemplateOptions();
   $("#databaseCount").textContent = `${tickets.length} ticket${tickets.length === 1 ? "" : "s"}`;
+  updatePrivacyWarning();
 }
 
 function renderMenuInputs() {
@@ -154,7 +155,7 @@ function renderScreen() {
   if (!generated) return;
   let lines;
   if (activePreview === "ticket" && generated.preview.firstTicket) {
-    lines = [generated.preview.firstTicket.ticketId, "", "1 Overview", "2 Games", "3 Programs", "4 Delivery", "5 Back"];
+    lines = [generated.preview.firstTicket.ticketId, "", "1 Overview", "2 Games", "3 Programs", "4 Delivery", "5 Details", "6 Back"];
   } else {
     lines = [generated.preview.title, ...generated.preview.menuItems.slice(0, 9).map((item, index) => `${index + 1} ${item}`)];
   }
