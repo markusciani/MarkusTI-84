@@ -8,6 +8,8 @@
     "build": "tsc -p tsconfig.json",
     "dev": "tsx watch src/index.ts",
     "start": "node dist/index.js",
+    "configure-local": "tsx scripts/configure-local.ts",
+    "install-tunnel-agent": "tsx scripts/install-tunnel-agent.ts",
     "install-agent": "npm run build -w @ti-tickets/shared && npm run build && tsx scripts/install-agent.ts",
     "uninstall-agent": "tsx scripts/uninstall-agent.ts"
   },

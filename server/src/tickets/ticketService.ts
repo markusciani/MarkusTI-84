@@ -30,6 +30,8 @@ export type CreateTicketResult =
   | { duplicate: false; id: number; ticketId: string; normalized: NormalizedTicket }
   | { duplicate: true; id: number; ticketId: string };
 
+export type ImportedTicket = Omit<NormalizedTicket, "ticketId">;
+
 const RETRY_DELAYS_MS = [60_000, 5 * 60_000, 15 * 60_000, 30 * 60_000, 60 * 60_000];
 
 export class TicketService {
@@ -58,6 +60,37 @@ export class TicketService {
         ticketId, payload.data.submissionId, payload.data.formId, config.formType,
         config.calculatorType, normalized.submittedAt, JSON.stringify(payload),
         JSON.stringify(normalized), now, now
+      );
+      this.db.exec("COMMIT");
+      return { duplicate: false, id: Number(result.lastInsertRowid), ticketId, normalized };
+    } catch (error) {
+      this.db.exec("ROLLBACK");
+      throw error;
+    }
+  }
+
+  importNormalized(ticket: ImportedTicket, ticketPrefix: string): CreateTicketResult {
+    this.db.exec("BEGIN IMMEDIATE");
+    try {
+      const existing = this.db.prepare(
+        "SELECT id, ticket_id FROM tickets WHERE tally_submission_id = ?"
+      ).get(ticket.tallySubmissionId) as { id: number; ticket_id: string } | undefined;
+      if (existing) {
+        this.db.exec("COMMIT");
+        return { duplicate: true, id: existing.id, ticketId: existing.ticket_id };
+      }
+      const ticketId = nextTicketId(this.db, ticketPrefix);
+      const normalized: NormalizedTicket = { ...ticket, ticketId };
+      const now = new Date().toISOString();
+      const result = this.db.prepare(`
+        INSERT INTO tickets (
+          ticket_id, tally_submission_id, tally_form_id, form_type, calculator_type,
+          submitted_at, payload_json, normalized_json, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).run(
+        ticketId, normalized.tallySubmissionId, normalized.formId, normalized.formType,
+        normalized.calculatorType, normalized.submittedAt,
+        JSON.stringify({ source: "google-sheets", importedAt: now }), JSON.stringify(normalized), now, now
       );
       this.db.exec("COMMIT");
       return { duplicate: false, id: Number(result.lastInsertRowid), ticketId, normalized };

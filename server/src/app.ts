@@ -7,7 +7,13 @@ import { builtInTemplates } from "./calculator/templates.js";
 import { TICKET_STATUSES } from "./calculator/types.js";
 import { formConfigs, findFormConfig } from "./config/forms.js";
 import { log } from "./log.js";
-import { validateApiSecret, validateTallyRequest } from "./security.js";
+import { googleSheetsConfigured, readGoogleSheet } from "./googleSheets/client.js";
+import { mapGoogleSheetRows } from "./googleSheets/mapper.js";
+import { googleSheetSources } from "./googleSheets/sources.js";
+import {
+  createBuilderSession, validateApiSecret, validateBuilderPassword,
+  validateBuilderSession, validateTallyRequest
+} from "./security.js";
 import { TicketService } from "./tickets/ticketService.js";
 import { isTallyWebhookPayload } from "./tally/types.js";
 
@@ -18,6 +24,8 @@ export interface AppOptions {
   tallyWebhookSecret?: string;
   webhookPathToken?: string;
   allowInsecureWebhooks?: boolean;
+  builderPasswordHash?: string;
+  builderSessionSecret?: string;
 }
 
 export function createApp(db: DatabaseSync, options: AppOptions = {}) {
@@ -27,6 +35,8 @@ export function createApp(db: DatabaseSync, options: AppOptions = {}) {
   const signingSecret = options.tallyWebhookSecret ?? process.env.TALLY_WEBHOOK_SECRET;
   const pathToken = options.webhookPathToken ?? process.env.WEBHOOK_PATH_TOKEN;
   const allowInsecure = options.allowInsecureWebhooks ?? process.env.ALLOW_INSECURE_WEBHOOKS === "true";
+  const builderPasswordHash = options.builderPasswordHash ?? process.env.BUILDER_PASSWORD_HASH ?? "";
+  const builderSessionSecret = options.builderSessionSecret ?? process.env.BUILDER_SESSION_SECRET ?? apiSecret;
 
   const webAppOrigin = process.env.WEB_APP_ORIGIN;
   app.use((req, res, next) => {
@@ -51,6 +61,14 @@ export function createApp(db: DatabaseSync, options: AppOptions = {}) {
 
   app.get("/health", (_req, res) => res.json({ ok: true }));
 
+  app.post("/auth/login", (req, res) => {
+    const password = typeof req.body?.password === "string" ? req.body.password : "";
+    if (!builderPasswordHash || !validateBuilderPassword(password, builderPasswordHash)) {
+      return res.status(401).json({ ok: false, error: "Incorrect password" });
+    }
+    return res.json({ ok: true, token: createBuilderSession(builderSessionSecret) });
+  });
+
   app.post("/webhooks/tally", (req: RawRequest, res) => {
     const signatureHeader = req.header("tally-signature") ?? undefined;
     const receivedToken = req.header("x-webhook-token") ?? (typeof req.query.token === "string" ? req.query.token : undefined);
@@ -68,7 +86,7 @@ export function createApp(db: DatabaseSync, options: AppOptions = {}) {
 
     const payload = req.body;
     log.info("Received Tally submission", { submissionId: payload.data.submissionId, formId: payload.data.formId });
-    const config = findFormConfig(payload.data.formId);
+    const config = findFormConfig(payload.data.formId, payload.data.formName);
     if (!config) {
       log.info("Ignored submission from unconfigured form", { formId: payload.data.formId });
       return res.status(200).json({ ok: true, ignored: true });
@@ -88,7 +106,12 @@ export function createApp(db: DatabaseSync, options: AppOptions = {}) {
   });
 
   const requireApiAuth = (req: Request, res: Response, next: NextFunction) => {
-    if (!validateApiSecret(req.header("authorization") ?? undefined, apiSecret)) {
+    const header = req.header("authorization") ?? undefined;
+    const bearer = header?.startsWith("Bearer ") ? header.slice(7) : "";
+    const builderRoute = req.path.startsWith("/program-builder") || req.path.startsWith("/google-sheets");
+    const allowed = validateApiSecret(header, apiSecret)
+      || (builderRoute && validateBuilderSession(bearer, builderSessionSecret));
+    if (!allowed) {
       return res.status(401).json({ ok: false, error: "Unauthorized" });
     }
     next();
@@ -131,6 +154,37 @@ export function createApp(db: DatabaseSync, options: AppOptions = {}) {
 
   app.get("/api/program-builder/tickets", (_req, res) => {
     res.json({ tickets: service.listForProgramBuilder() });
+  });
+
+  app.get("/api/google-sheets/status", (_req, res) => {
+    res.json({
+      configured: googleSheetsConfigured(),
+      sources: googleSheetSources.map((source) => ({ key: source.key, title: source.title }))
+    });
+  });
+
+  app.post("/api/google-sheets/import", async (_req, res) => {
+    if (!googleSheetsConfigured()) {
+      return res.status(503).json({ ok: false, error: "Private Google Sheets access has not been configured on the Mac server" });
+    }
+    try {
+      let imported = 0;
+      let duplicates = 0;
+      const sources = [];
+      for (const source of googleSheetSources) {
+        const values = await readGoogleSheet(source);
+        const tickets = mapGoogleSheetRows(source, values);
+        for (const ticket of tickets) {
+          const result = service.importNormalized(ticket, source.ticketPrefix);
+          result.duplicate ? duplicates++ : imported++;
+        }
+        sources.push({ key: source.key, title: source.title, submissions: tickets.length });
+      }
+      return res.json({ ok: true, imported, duplicates, sources });
+    } catch (error) {
+      log.error("Google Sheets import failed", { error: String(error) });
+      return res.status(502).json({ ok: false, error: error instanceof Error ? error.message : "Google Sheets import failed" });
+    }
   });
 
   const runBuilder = (req: Request, res: Response, download: boolean) => {

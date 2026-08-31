@@ -175,9 +175,31 @@ export const formConfigs: FormConfig[] = [
       "Signature Received": "options.signatureReceived", "Signature URL": "options.signatureUrl",
       "Status": "$status", "Tally Submission ID": "tallySubmissionId"
     }
+  },
+  {
+    formId: process.env.TALLY_PLUS_FORM_ID || "GOOGLE_SHEET_TI84_PLUS",
+    formName: "TI-84 Plus Ticket",
+    formType: "plus",
+    calculatorType: "TI-84 Plus",
+    ticketType: "Game Ticket",
+    ticketPrefix: "PLUS",
+    numbersSheet: "TI-84 Plus",
+    numbersTable: "Tickets",
+    active: true,
+    capabilities: { games: true, programs: true, python: false, gameLauncher: false },
+    fields: {},
+    groups: { games: [], programs: [], gameMatrixLabels: ["Games for TI-84 Plus & TI-83 Plus"], programMatrixLabels: ["ALGEBRA / MATHEMATICS", "SCIENCE", "OTHER"] },
+    detailColumns: {
+      "Ticket ID": "ticketId", "Submitted": "submittedAt", "First Name": "person.firstName",
+      "Phone": "person.phone", "Email": "person.email", "Grade": "person.grade",
+      "Calculator Model": "calculator.model", "Version": "calculator.version",
+      "Games Requested": "games", "Programs Requested": "programs", "Delivery": "delivery.option",
+      "Status": "$status", "Tally Submission ID": "tallySubmissionId"
+    }
   }
 ];
 
-export function findFormConfig(formId: string): FormConfig | undefined {
-  return formConfigs.find((form) => form.active && form.formId === formId);
+export function findFormConfig(formId: string, formName?: string): FormConfig | undefined {
+  return formConfigs.find((form) => form.active && form.formId === formId)
+    ?? formConfigs.find((form) => form.active && Boolean(formName) && form.formName === formName);
 }

@@ -21,5 +21,11 @@ export const tableSchemas: TableSchema[] = [
       "Programs Requested", "Delivery", "Print Name", "Signature Received", "Signature URL",
       "Status", "Tally Submission ID"
     ]
+  },
+  {
+    sheet: "TI-84 Plus", table: "Tickets", headers: [
+      "Ticket ID", "Submitted", "First Name", "Phone", "Email", "Grade", "Calculator Model",
+      "Version", "Games Requested", "Programs Requested", "Delivery", "Status", "Tally Submission ID"
+    ]
   }
 ];

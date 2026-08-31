@@ -25,6 +25,11 @@ export const calculatorModels: CalculatorModel[] = [
     id: "TI-84 Plus CE Python", label: "TI-84 Plus CE Python", tiBasic: true, pythonHardware: true,
     programNameMaxLength: 8, displayColumns: 26, displayRows: 10,
     availableBytes: 3_000_000, recommendedProgramBytes: 180_000
+  },
+  {
+    id: "TI-84 Plus", label: "TI-84 Plus / TI-83 Plus", tiBasic: true, pythonHardware: false,
+    programNameMaxLength: 8, displayColumns: 16, displayRows: 8,
+    availableBytes: 24_000, recommendedProgramBytes: 16_000
   }
 ];
 

@@ -17,16 +17,24 @@
   </header>
 
   <main>
+    <section class="auth-card browser-block hidden" id="browserBlock">
+      <div>
+        <p class="eyebrow blue">GOOGLE CHROME REQUIRED</p>
+        <h2>Open this builder in Google Chrome</h2>
+        <p>The calculator connection uses Chrome's USB support. Safari, Firefox, Edge, and in-app browsers are intentionally blocked.</p>
+      </div>
+      <a class="button-link primary" href="https://www.google.com/chrome/">GET GOOGLE CHROME</a>
+    </section>
+
     <section class="auth-card" id="authCard">
       <div>
         <p class="eyebrow blue">SECURE ACCESS</p>
-        <h2>Connect to the ticket database</h2>
-        <p>Your API secret stays in this browser tab and is never added to generated calculator programs.</p>
+        <h2>Unlock the ticket builder</h2>
+        <p>Enter the builder password. The password is verified by the Mac server and is never stored in the page or added to calculator programs.</p>
       </div>
       <form id="authForm">
-        <label>API server URL<input id="apiBaseUrl" type="url" placeholder="https://tickets-mti84.ciani01.org" autocomplete="url" required></label>
-        <label>API secret<input id="apiSecret" type="password" autocomplete="current-password" required></label>
-        <button class="primary" type="submit">CONNECT</button>
+        <label>Builder password<input id="builderPassword" type="password" autocomplete="current-password" required></label>
+        <button class="primary" type="submit">UNLOCK</button>
       </form>
     </section>
 
@@ -39,6 +47,13 @@
           </div>
           <span class="ticket-count" id="databaseCount">0 tickets</span>
           <p>Creates an offline TI-BASIC snapshot. No phone, email, signatures, uploads, or raw webhook data are included by default.</p>
+        </section>
+
+        <section class="panel sheet-panel">
+          <div class="section-heading"><span>↻</span><h3>Google Sheets</h3></div>
+          <p id="sheetSummary">Checking the three private ticket sheets…</p>
+          <div class="source-list" id="sheetSources"></div>
+          <div class="inline-actions"><button id="syncSheets" class="quiet" type="button">SYNC SHEETS NOW</button></div>
         </section>
 
         <section class="panel form-panel">
@@ -106,6 +121,7 @@
           <button id="previewButton" class="secondary" type="button">PREVIEW</button>
           <button id="generateButton" class="primary" type="button">GENERATE</button>
           <button id="downloadButton" class="download" type="button" disabled>DOWNLOAD SOURCE</button>
+          <button id="sendToCalculator" class="primary" type="button" disabled>DOWNLOAD + OPEN TI CONNECT</button>
         </div>
       </aside>
 

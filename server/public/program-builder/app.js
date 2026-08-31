@@ -4,8 +4,8 @@ const menuDefaults = {
   all: "ALL TICKETS", new: "NEW", working: "WORKING", ready: "READY", completed: "COMPLETED",
   search: "SEARCH", stats: "STATS", about: "ABOUT", exit: "EXIT"
 };
-let apiBaseUrl = sessionStorage.getItem("tiBuilderApiBaseUrl") || window.TI_API_BASE_URL || window.location.origin;
-let apiSecret = sessionStorage.getItem("tiBuilderApiSecret") || "";
+const apiBaseUrl = (window.TI_API_BASE_URL || window.location.origin).replace(/\/$/, "");
+let sessionToken = sessionStorage.getItem("tiBuilderSession") || "";
 let config = null;
 let tickets = [];
 let generated = null;
@@ -22,10 +22,9 @@ function toast(message, error = false) {
 }
 
 async function api(path, options = {}) {
-  const baseUrl = apiBaseUrl.endsWith("/") ? apiBaseUrl.slice(0, -1) : apiBaseUrl;
-  const response = await fetch(`${baseUrl}${path}`, {
+  const response = await fetch(`${apiBaseUrl}${path}`, {
     ...options,
-    headers: { authorization: `Bearer ${apiSecret}`, "content-type": "application/json", ...(options.headers || {}) }
+    headers: { authorization: `Bearer ${sessionToken}`, "content-type": "application/json", ...(options.headers || {}) }
   });
   const body = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(body.error || `Request failed with HTTP ${response.status}`);
@@ -84,19 +83,34 @@ function renderMenuInputs() {
 
 async function connect() {
   try {
-    [config, { tickets }] = await Promise.all([
-      api("/api/program-builder/config"), api("/api/program-builder/tickets")
+    let sheetStatus;
+    [config, { tickets }, sheetStatus] = await Promise.all([
+      api("/api/program-builder/config"), api("/api/program-builder/tickets"), api("/api/google-sheets/status")
     ]);
     window.tickets = tickets;
-    sessionStorage.setItem("tiBuilderApiSecret", apiSecret);
+    sessionStorage.setItem("tiBuilderSession", sessionToken);
     setConnected(true);
     renderConfig();
+    renderSheetStatus(sheetStatus);
     toast("Connected to the ticket database");
     await runBuilder("preview", false);
   } catch (error) {
     setConnected(false);
     toast(error.message, true);
   }
+}
+
+function renderSheetStatus(status) {
+  $("#sheetSources").replaceChildren(...status.sources.map((source) => {
+    const row = document.createElement("div");
+    row.innerHTML = "<i></i>";
+    row.append(document.createTextNode(source.title));
+    return row;
+  }));
+  $("#sheetSummary").textContent = status.configured
+    ? "Private server access is configured. New rows can be synchronized here."
+    : "Historical rows are loaded. Future responses continue through the Tally webhooks; private automatic Sheet refresh still needs a Google service account.";
+  $("#syncSheets").disabled = !status.configured;
 }
 
 function selectedFields() {
@@ -157,6 +171,7 @@ function renderResult(result) {
   $("#sizeWarning").textContent = result.warning || "";
   $("#sizeWarning").classList.toggle("hidden", !result.warning);
   $("#downloadButton").disabled = false;
+  $("#sendToCalculator").disabled = false;
   $("#copySource").disabled = false;
   $("#resetSource").disabled = false;
   renderScreen();
@@ -180,6 +195,13 @@ function downloadSource() {
   link.click();
   setTimeout(() => URL.revokeObjectURL(link.href), 1000);
   toast(`Downloaded ${generated.fileName}${manualEdited ? " with manual edits" : ""}`);
+}
+
+function openTiConnect() {
+  if (!generated) return;
+  window.open("https://connectevo.ti.com/ticevo/en/", "_blank", "noopener");
+  downloadSource();
+  toast("Source downloaded. Use TI Connect in the new Chrome tab to select the file and send it over USB.");
 }
 
 function currentTemplateConfig() {
@@ -228,14 +250,33 @@ function updatePrivacyWarning() {
 
 $("#authForm").addEventListener("submit", async (event) => {
   event.preventDefault();
-  apiSecret = $("#apiSecret").value;
-  apiBaseUrl = $("#apiBaseUrl").value.trim();
-  sessionStorage.setItem("tiBuilderApiBaseUrl", apiBaseUrl);
-  await connect();
+  try {
+    const response = await fetch(`${apiBaseUrl}/auth/login`, {
+      method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ password: $("#builderPassword").value })
+    });
+    const body = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(body.error || "Unable to unlock the builder");
+    sessionToken = body.token;
+    $("#builderPassword").value = "";
+    await connect();
+  } catch (error) { toast(error.message, true); }
 });
 $("#previewButton").addEventListener("click", () => runBuilder("preview"));
 $("#generateButton").addEventListener("click", () => runBuilder("generate"));
 $("#downloadButton").addEventListener("click", downloadSource);
+$("#sendToCalculator").addEventListener("click", openTiConnect);
+$("#syncSheets").addEventListener("click", async () => {
+  try {
+    $("#syncSheets").disabled = true;
+    const result = await api("/api/google-sheets/import", { method: "POST", body: "{}" });
+    toast(`Sheets synchronized: ${result.imported} new, ${result.duplicates} already loaded`);
+    await connect();
+  } catch (error) {
+    toast(error.message, true);
+    $("#syncSheets").disabled = false;
+  }
+});
 $("#copySource").addEventListener("click", async () => {
   await navigator.clipboard.writeText($("#sourceEditor").value);
   toast("Source copied to the clipboard");
@@ -285,8 +326,12 @@ $("#saveTemplate").addEventListener("click", () => {
 });
 
 renderMenuInputs();
-$("#apiBaseUrl").value = apiBaseUrl;
-if (apiSecret) {
-  $("#apiSecret").value = apiSecret;
+const chromeBrands = navigator.userAgentData?.brands?.map((item) => item.brand) || [];
+const isGoogleChrome = chromeBrands.includes("Google Chrome")
+  || (/Chrome\//.test(navigator.userAgent) && !/(Edg|OPR|Brave|CriOS)\//.test(navigator.userAgent));
+if (!isGoogleChrome) {
+  $("#authCard").classList.add("hidden");
+  $("#browserBlock").classList.remove("hidden");
+} else if (sessionToken) {
   connect();
 }

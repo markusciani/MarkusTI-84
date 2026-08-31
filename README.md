@@ -85,16 +85,19 @@ Replace the matching placeholder in [`server/src/config/forms.ts`](server/src/co
 | `PORT`, `HOST` | server | HTTP bind; use `HOST=0.0.0.0` in a container |
 | `DATABASE_PATH` | server | Persistent SQLite file |
 | `API_SECRET` | both | Long bearer secret shared by server and Mac |
+| `BUILDER_PASSWORD_HASH` | server | Scrypt hash used by the Chrome Builder login |
+| `BUILDER_SESSION_SECRET` | server | Signs eight-hour, Builder-only browser sessions |
 | `TALLY_WEBHOOK_SECRET` | server | Preferred Tally signing secret |
 | `WEBHOOK_PATH_TOKEN` | server | Secure fallback when signing cannot be enabled |
 | `TALLY_EVO_FORM_ID`, `TALLY_CE_FORM_ID` | server | Real ticket form IDs |
+| `GOOGLE_SERVICE_ACCOUNT_FILE` | server | Optional private Google service-account JSON for Sheet refresh |
 | `SYNC_API_URL` | Mac | Public server base URL |
 | `SYNC_INTERVAL_SECONDS` | Mac | Poll interval; minimum 30 seconds |
 | `NUMBERS_DOCUMENT_PATH` | Mac | Absolute path to the single Numbers document |
 | `DRY_RUN` | Mac | Defaults to `true`; set exactly `false` for live writes |
 | `SYNC_NUMBERS_STATUSES` | Mac | Defaults to `true`; reconciles manual Numbers Status edits back to the server |
 
-Never commit `.env`. Generate secrets with `openssl rand -base64 48`.
+Never commit `.env`. `npm run configure-local -w @ti-tickets/server` creates local secrets and hashes a password supplied over standard input. The password itself is not written to source or browser JavaScript.
 
 ## 8. Database setup
 
@@ -115,7 +118,7 @@ npm run install-server-agent
 
 Remove only the local server service with `npm run uninstall-server-agent`; its database and logs are preserved. The installed runtime, database, and logs live under `~/Library/Application Support/TITicketAutomation`, avoiding macOS background-access restrictions on Documents. This local service is convenient for the Builder, but it is not a substitute for public hosting when webhooks must arrive while the Mac is off.
 
-`GET /health` is public. All `/api/*` endpoints require `Authorization: Bearer $API_SECRET`.
+`GET /health` and `POST /auth/login` are public. Operational `/api/*` endpoints require `Authorization: Bearer $API_SECRET`; a successful Builder login returns a short-lived token restricted to the Builder and Google Sheet routes.
 
 ## 9. Numbers setup
 
@@ -127,7 +130,7 @@ Create or safely complete the required sheets, `Tickets` tables, and headers:
 npm run numbers:init
 ```
 
-The command adds missing sheets/tables/headers and does not remove existing columns. The document contains `All Tickets`, `TI-84 Evo`, and `TI-84 Plus CE`. The live writer locates every column by its header text, not by column number. Newline-separated game/program names stay inside one cell. File uploads and signatures are stored as URL text plus `Signature Received`; no large file is embedded.
+The command adds missing sheets/tables/headers and does not remove existing columns. The document contains `All Tickets`, `TI-84 Evo`, `TI-84 Plus CE`, and `TI-84 Plus`. The live writer locates every column by its header text, not by column number. Newline-separated game/program names stay inside one cell. File uploads and signatures are stored as URL text plus `Signature Received`; no large file is embedded.
 
 Before live use, open the document once and confirm the three table names. In System Settings → Privacy & Security → Automation, allow the process running the agent to control Numbers if macOS prompts.
 
@@ -190,9 +193,9 @@ The authenticated Builder is served by the same server at:
 http://YOUR-SERVER/program-builder/
 ```
 
-Enter `API_SECRET` in the connection screen. It is retained only in that browser tab. The Builder provides:
+Open the Builder in Google Chrome and enter the dedicated Builder password. The password is verified by the server and exchanged for an eight-hour, Builder-only session; the API secret is never exposed to the page. The Builder provides:
 
-- TI-BASIC source generation for TI-84 Evo, TI-84 Plus CE, and TI-84 Plus CE Python
+- TI-BASIC source generation for TI-84 Evo, TI-84 Plus CE, TI-84 Plus CE Python, and TI-84 Plus / TI-83 Plus
 - One nine-item `TILOGS` menu with All, New, Working, Ready, Completed, Search, Stats, About, and Exit
 - Left/right ticket and page navigation, Clear-to-back behavior, and numeric Ticket ID search
 - Calculator, status, date, exact ID, ID range, recency-limit, and sort filters
@@ -200,8 +203,10 @@ Enter `API_SECRET` in the connection screen. It is retained only in that browser
 - Built-in templates plus browser-local saved templates
 - Configurable title, menu labels, about text, footer, fields, and program name
 - Phone/email controls in an explicitly marked advanced section; both remain off by default
+- Three private Google Sheet source indicators and an authenticated refresh action when a service account is configured
+- A Download + Open TI Connect action that opens TI Connect Evo in Chrome after saving the source fallback
 
-Signatures, signature URLs, uploads, screenshots, file URLs, and raw webhook payloads are never exposed to the Builder API. Version 1 exports reviewed `.txt` source and deliberately does not claim `.8xp` support. Use TI Connect Evo or TI Connect CE/a compatible editor to review and transfer the source.
+Signatures, signature URLs, uploads, screenshots, file URLs, and raw webhook payloads are never exposed to the Builder API. Imported Sheet rows keep the values needed by Numbers, but discard private signature/upload URLs. The current exporter creates reviewed `.txt` source and deliberately does not claim direct WebUSB or `.8xp` support. TI Connect Evo owns the USB connection and file transfer in its Chrome tab.
 
 `Status` is now stored in SQLite. During each live Mac sync pass, the agent reads the `Ticket ID` and `Status` columns from `All Tickets / Tickets` and reconciles recognized manual changes back to the server before program generation. It accepts the canonical statuses plus common display aliases such as `READY`, `DONE`, `WAIT CALC`, and `WAIT USER`. Set `SYNC_NUMBERS_STATUSES=false` only if Numbers should not be authoritative.
 
@@ -212,6 +217,8 @@ GET   /api/program-builder/config
 GET   /api/program-builder/tickets
 POST  /api/program-builder/preview
 POST  /api/program-builder/generate
+GET   /api/google-sheets/status
+POST  /api/google-sheets/import
 PATCH /api/tickets/:databaseId-or-ticketId/status
 ```
 
