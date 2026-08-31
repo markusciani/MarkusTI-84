@@ -36,6 +36,30 @@ function menuLine(title: string, items: Array<[string, string]>): string {
   return `:Menu("${sourceString(title)}",${items.map(([name, label]) => `"${sourceString(name, 20)}",${label}`).join(",")})`;
 }
 
+function ticketListName(ticket: CalculatorTicket, showFirstName: boolean): string {
+  return showFirstName && ticket.firstName ? `${ticket.ticketId} ${ticket.firstName}` : ticket.ticketId;
+}
+
+function twoLineTextPages(values: string[], width: number): string[][] {
+  let lines = values.length ? wrapCalculatorText(values.join(", "), width, 1000) : ["None requested"];
+  if (values.length > 1 && lines.length === 1) {
+    const split = Math.ceil(values.length / 2);
+    lines = [values.slice(0, split).join(", "), values.slice(split).join(", ")];
+  }
+  return Array.from({ length: Math.ceil(lines.length / 2) }, (_, page) => lines.slice(page * 2, page * 2 + 2));
+}
+
+function pagedText(input: { title: string; pages: string[][]; pageLabels: string[]; returnLabel: string }): string[] {
+  return input.pages.flatMap((lines, page) => [
+    `:Lbl ${input.pageLabels[page]}`,
+    ":ClrHome",
+    `:Disp "${sourceString(`${input.title} ${page + 1}/${input.pages.length}`)}"`,
+    ...lines.map((line) => `:Disp "${sourceString(line)}"`),
+    ":Pause ",
+    `:Goto ${page + 1 < input.pages.length ? input.pageLabels[page + 1] : input.returnLabel}`
+  ]);
+}
+
 function pagedMenu(input: { title: string; values: string[]; pageLabels: string[]; returnLabel: string }): string[] {
   const pageSize = 4;
   const pages = Math.max(1, Math.ceil(input.values.length / pageSize));
@@ -79,7 +103,8 @@ export function generateTiBasic(input: {
   const deliveryLabels = tickets.map(() => allocate());
   const contactLabels = tickets.map(() => allocate());
   const listPages = Array.from({ length: Math.max(1, Math.ceil(tickets.length / 4)) }, () => allocate());
-  const gamePages = tickets.map((ticket) => Array.from({ length: Math.max(1, Math.ceil(ticket.games.length / 4)) }, () => allocate()));
+  const gameTextPages = tickets.map((ticket) => twoLineTextPages(ticket.games, model.displayColumns));
+  const gamePages = gameTextPages.map((pages) => Array.from({ length: pages.length }, () => allocate()));
   const programPages = tickets.map((ticket) => Array.from({ length: Math.max(1, Math.ceil(ticket.programs.length / 4)) }, () => allocate()));
   const aboutMenu = allocate();
   const aboutPurpose = allocate();
@@ -100,7 +125,7 @@ export function generateTiBasic(input: {
   for (let page = 0; page < listPages.length && tickets.length; page += 1) {
     const start = page * 4;
     const pageTickets = tickets.slice(start, start + 4);
-    const items: Array<[string, string]> = pageTickets.map((ticket, index) => [ticket.ticketId, ticketMenuLabels[start + index]]);
+    const items: Array<[string, string]> = pageTickets.map((ticket, index) => [ticketListName(ticket, enabled(fields, "firstName")), ticketMenuLabels[start + index]]);
     if (listPages.length > 1) {
       items.push(["Next", page + 1 < listPages.length ? listPages[page + 1] : "M"]);
       items.push(["Previous", page > 0 ? listPages[page - 1] : "M"]);
@@ -125,7 +150,7 @@ export function generateTiBasic(input: {
     if (enabled(fields, "status")) overview.push(`Status: ${shortStatus(ticket.status)}`);
     if (enabled(fields, "submittedDate")) overview.push(`Date: ${ticket.submittedAt.slice(0, 10)}`);
     source.push(`:Lbl ${overviewLabels[index]}`, ...displayScreen(ticket.ticketId, overview, ticketMenu, model.displayRows));
-    source.push(...pagedMenu({ title: "Games", values: ticket.games, pageLabels: gamePages[index], returnLabel: ticketMenu }));
+    source.push(...pagedText({ title: "Games", pages: gameTextPages[index], pageLabels: gamePages[index], returnLabel: ticketMenu }));
     source.push(...pagedMenu({ title: "Programs", values: ticket.programs, pageLabels: programPages[index], returnLabel: ticketMenu }));
 
     const delivery = wrapCalculatorText(ticket.delivery || "No delivery option", model.displayColumns, model.displayRows - 2);
@@ -151,7 +176,7 @@ export function generateTiBasic(input: {
       source.push(`:If N=${number}`, `:Goto ${resultLabel}`);
       duplicateSearchMenus.push(`:Lbl ${resultLabel}`,
         menuLine(`TICKET ${number}`, [
-          ...indexes.map((index) => [tickets[index].ticketId, ticketMenuLabels[index]] as [string, string]),
+          ...indexes.map((index) => [ticketListName(tickets[index], enabled(fields, "firstName")), ticketMenuLabels[index]] as [string, string]),
           ["Back", "S"]
         ]));
     }

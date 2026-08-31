@@ -56,8 +56,10 @@ test("generates five-item main menu, ticket submenus, search, stats, about, and 
   assert.equal(result.ticketCount, 3);
   assert.match(result.source, /:Menu\("TI Ticket Logs","Tickets",A,"Search",S,"Stats",T,"About",B,"Quit",X\)/);
   assert.doesNotMatch(result.source, /"New",|"Working",|"Completed",/);
+  assert.match(result.source, /:Menu\("Tickets 1\/1","EVO-0043 Sam",[A-Z]{2},"EVO-0042 Jose",[A-Z]{2},"CE-0042 Alex",[A-Z]{2},"Main menu",M\)/);
   assert.match(result.source, /:Menu\("EVO-0042","Overview",[A-Z]{2},"Games",[A-Z]{2},"Programs",[A-Z]{2},"Delivery",[A-Z]{2},"Back",[A-Z]{2}\)/);
-  assert.match(result.source, /:Menu\("Games 1\/1","Pokemon",[A-Z]{2},"Snake",[A-Z]{2},"Tetris",[A-Z]{2},"Ticket",[A-Z]{2}\)/);
+  assert.match(result.source, /:Disp "Games 1\/1"\n:Disp "Pokemon, Snake"\n:Disp "Tetris"\n:Pause \n:Goto [A-Z]{2}/);
+  assert.doesNotMatch(result.source, /:Menu\("Games/);
   assert.match(result.source, /:Menu\("Programs 1\/1","Quadratic Formula",[A-Z]{2},"Radical Simplifier",[A-Z]{2},"Ticket",[A-Z]{2}\)/);
   assert.match(result.source, /:Input "Ticket number:",N/);
   assert.match(result.source, /:If N=42\n:Goto [A-Z]{2}/);
