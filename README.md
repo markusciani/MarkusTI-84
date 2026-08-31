@@ -203,7 +203,7 @@ Open the Builder in Google Chrome and enter the dedicated Builder password. The 
 - A calculator-style preview, source editor, reset/copy controls, text download, size estimate, and model warning
 - Built-in templates plus browser-local saved templates
 - Configurable title, menu labels, about text, footer, fields, and program name
-- A PIN-gated Preferences menu in About that identifies the private Builder website without embedding its password in the calculator file
+- A PIN-gated Preferences screen in About that shows the private Builder website and password together
 - Mixed-case website and calculator labels for a friendlier, more readable design
 - Phone/email controls in an explicitly marked advanced section; both remain off by default
 - Three private Google Sheet source indicators and an authenticated refresh action when a service account is configured

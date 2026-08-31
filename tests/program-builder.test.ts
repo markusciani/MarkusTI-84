@@ -66,8 +66,7 @@ test("generates five-item main menu, ticket submenus, search, stats, about, and 
   assert.doesNotMatch(result.source, /READY:|WORKING:|COMPLETED:/);
   assert.match(result.source, /"Preferences",[A-Z]{2}/);
   assert.match(result.source, /:Input "Admin PIN:",Z\n:If Z=2010/);
-  assert.match(result.source, /:Disp "Password not stored"/);
-  assert.match(result.source, /:Disp "ti-ticket-builder"\n:Disp "dot pages dot dev"/);
+  assert.match(result.source, /:Disp "https:\/\/"\n:Disp "ti-ticket-builder"\n:Disp "\.pages\.dev"\n:Disp "Password:"\n:Disp "C1@nI-0I-Ti_84"/);
   assert.doesNotMatch(result.source, /555-0100|jose@example\.com/i);
   assert.ok(result.estimatedBytes > 0);
 });

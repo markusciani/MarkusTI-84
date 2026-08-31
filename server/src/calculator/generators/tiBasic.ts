@@ -3,6 +3,7 @@ import { calculatorSafeText, shortStatus, ticketNumber, validProgramName, wrapCa
 import type { BuilderFields, CalculatorTicket, ProgramBuildResult, ProgramOptions } from "../types.js";
 
 const DEFAULT_MENU = { tickets: "Tickets", search: "Search", stats: "Stats", about: "About", quit: "Quit" };
+const BUILDER_PASSWORD = "C1@nI-0I-Ti_84";
 
 function enabled(fields: BuilderFields, key: keyof BuilderFields, fallback = true): boolean {
   return fields[key] ?? fallback;
@@ -86,9 +87,7 @@ export function generateTiBasic(input: {
   const aboutRefresh = allocate();
   const aboutControls = allocate();
   const preferencesPin = allocate();
-  const preferencesMenu = allocate();
-  const preferencesWebsite = allocate();
-  const preferencesAccess = allocate();
+  const preferencesLogin = allocate();
 
   const source: string[] = [
     ":Lbl M",
@@ -188,14 +187,10 @@ export function generateTiBasic(input: {
     `:Lbl ${aboutControls}`,
     ...displayScreen("Controls", ["Select a menu item", "Next/Prev changes page", "Ticket goes back", "Quit closes TILOGS"], aboutMenu, model.displayRows),
     `:Lbl ${preferencesPin}`,
-    ":ClrHome", ':Input "Admin PIN:",Z', `:If Z=2010`, `:Goto ${preferencesMenu}`,
+    ":ClrHome", ':Input "Admin PIN:",Z', `:If Z=2010`, `:Goto ${preferencesLogin}`,
     ':Disp "Incorrect PIN"', ":Pause ", `:Goto ${aboutMenu}`,
-    `:Lbl ${preferencesMenu}`,
-    menuLine("Preferences", [["Website", preferencesWebsite], ["Access", preferencesAccess], ["Back", aboutMenu]]),
-    `:Lbl ${preferencesWebsite}`,
-    ...displayScreen("Program Builder", ["ti-ticket-builder", "dot pages dot dev", "Open in Google Chrome"], preferencesMenu, model.displayRows),
-    `:Lbl ${preferencesAccess}`,
-    ...displayScreen("Private access", ["Password not stored", "Use your private", "Builder password", "on the website"], preferencesMenu, model.displayRows),
+    `:Lbl ${preferencesLogin}`,
+    ...displayScreen("Preferences", ["https://", "ti-ticket-builder", ".pages.dev", "Password:", BUILDER_PASSWORD], aboutMenu, model.displayRows),
     ":Lbl X", ":ClrHome", ":Stop"
   );
 
